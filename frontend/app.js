@@ -1,4 +1,4 @@
-const REPORT_URL = "./data/latest-report.json";
+const REPORT_URL = "/data/latest-report.json";
 
 const els = {
   updatedAt: document.getElementById("updated-at"),
