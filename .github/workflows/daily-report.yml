@@ -36,6 +36,7 @@ jobs:
       
       - name: Copy report to frontend
         run: |
+          mkdir -p frontend/data
           cp data/latest-report.json frontend/data/latest-report.json
       
       - name: Commit and push updated report
