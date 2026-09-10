@@ -1,0 +1,47 @@
+name: Daily Crypto Intelligence Report
+
+on:
+  schedule:
+    # Run daily at 6:30 AM IST (1:00 AM UTC)
+    - cron: '0 1 * * *'
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Generate crypto intelligence report
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          CMC_API_KEY: ${{ secrets.CMC_API_KEY }}
+        run: |
+          cd agent
+          python run.py
+      
+      - name: Copy report to frontend
+        run: |
+          cp data/latest-report.json frontend/data/latest-report.json
+      
+      - name: Commit and push updated report
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add data/latest-report.json frontend/data/latest-report.json
+          git diff --staged --quiet || git commit -m "Update daily crypto intelligence report [skip ci]"
+          git push
