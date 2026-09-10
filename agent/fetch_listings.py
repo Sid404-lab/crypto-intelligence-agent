@@ -1,4 +1,5 @@
 import re
+from datetime import datetime, timezone, timedelta
 
 from config import (
     CMC_LISTINGS_LATEST_PUBLIC_URL,
@@ -41,6 +42,10 @@ def _listing(name, symbol, added_at, source, url, extra_note=None):
 
 
 def fetch_delta_listings():
+    """
+    Fetch Delta Exchange India listings, filtering to only products created in the last 7 days.
+    Uses Delta's actual created_at timestamp for dynamic filtering.
+    """
     errors = []
     items = []
     params = {
@@ -48,6 +53,10 @@ def fetch_delta_listings():
         "states": "live",
         "page_size": 100,
     }
+    
+    # Calculate 7-day window from current time (UTC)
+    seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
+    
     try:
         after = None
         for _ in range(4):
@@ -67,25 +76,47 @@ def fetch_delta_listings():
         underlying = product.get("underlying_asset") or {}
         symbol = str(underlying.get("symbol") or "").upper()
         name = underlying.get("name") or product.get("description") or symbol
+        
+        # Skip major symbols and invalid symbols
         if symbol in MAJOR_SYMBOLS or not SYMBOL_RE.match(symbol) or not name:
             continue
+        
+        # Use created_at timestamp for 7-day filtering
+        created_at = product.get("created_at")
+        if created_at:
+            try:
+                # Parse ISO timestamp and convert to UTC
+                created_time = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+                if created_time.tzinfo is None:
+                    created_time = created_time.replace(tzinfo=timezone.utc)
+                else:
+                    created_time = created_time.astimezone(timezone.utc)
+                
+                # Only include products from the last 7 days
+                if created_time < seven_days_ago:
+                    continue
+            except (ValueError, TypeError):
+                # If we can't parse the timestamp, skip this product
+                continue
+        
         ranked.append(
             (
-                product.get("launch_time") or "",
+                created_at or product.get("launch_time") or "",
                 _listing(
                     name,
                     symbol,
-                    _iso_day(product.get("launch_time")),
+                    _iso_day(created_at or product.get("launch_time")),
                     "Delta India",
                     f"https://www.delta.exchange/app/futures/trade/{product.get('symbol')}",
                     extra_note=(
-                        f"Listed on Delta India - {_iso_day(product.get('launch_time'))}"
-                        if product.get("launch_time")
+                        f"Listed on Delta India - {_iso_day(created_at or product.get('launch_time'))}"
+                        if (created_at or product.get("launch_time"))
                         else "Listed on Delta India"
                     ),
                 ),
             )
         )
+    
     ranked.sort(key=lambda row: row[0], reverse=True)
     unique = []
     seen = set()
@@ -222,6 +253,98 @@ def merge_listings(*groups):
             if len(merged) >= LISTINGS_LIMIT:
                 return merged
     return merged
+
+
+def fetch_trending_coins():
+    """
+    Fetch trending coins from Delta Exchange India based on market activity.
+    Trending score is calculated using:
+    - 24h price change (volatility)
+    - Trading volume (liquidity)
+    - Normalized combination of both factors
+    
+    Returns a ranked list of trending coins with their metrics.
+    """
+    errors = []
+    try:
+        # Fetch all live perpetual futures from Delta
+        params = {
+            "contract_types": "perpetual_futures",
+            "states": "live",
+            "page_size": 100,
+        }
+        
+        items = []
+        after = None
+        for _ in range(4):
+            if after:
+                params["after"] = after
+            payload = get_json(f"{DELTA_BASE}/products", params=params, timeout=25)
+            batch = payload.get("result") or []
+            items.extend(batch)
+            after = (payload.get("meta") or {}).get("after")
+            if not after or not batch:
+                break
+        
+        # Fetch ticker data for price and volume information
+        ticker_params = {
+            "contract_types": "perpetual_futures",
+        }
+        ticker_payload = get_json(f"{DELTA_BASE}/tickers", params=ticker_params, timeout=25)
+        tickers = {t.get("symbol"): t for t in ticker_payload.get("result") or []}
+        
+        trending = []
+        for product in items:
+            product_symbol = product.get("symbol")
+            if not product_symbol:
+                continue
+                
+            underlying = product.get("underlying_asset") or {}
+            symbol = str(underlying.get("symbol") or "").upper()
+            name = underlying.get("name") or product.get("description") or symbol
+            
+            # Skip major symbols and invalid symbols
+            if symbol in MAJOR_SYMBOLS or not SYMBOL_RE.match(symbol) or not name:
+                continue
+            
+            # Get ticker data for this product
+            ticker = tickers.get(product_symbol)
+            if not ticker:
+                continue
+            
+            # Extract metrics
+            price = to_float(ticker.get("spot_price")) or to_float(ticker.get("mark_price"))
+            change_24h = to_float(ticker.get("mark_change_24h")) or to_float(ticker.get("ltp_change_24h")) or 0
+            volume = to_float(ticker.get("turnover_usd")) or 0
+            
+            if price is None or volume == 0:
+                continue
+            
+            # Calculate trending score
+            # Score combines absolute price change (volatility) and volume (liquidity)
+            # Higher volume with significant price changes = more trending
+            change_score = abs(change_24h)  # Absolute 24h change
+            volume_score = min(volume / 1_000_000, 10)  # Normalize volume (cap at 10M for score)
+            trending_score = (change_score * 2) + volume_score  # Weight change more heavily
+            
+            trending.append({
+                "symbol": symbol,
+                "name": name,
+                "price": price,
+                "change_24h": change_24h,
+                "volume": volume,
+                "trending_score": round(trending_score, 2),
+                "contract": product_symbol,
+                "url": f"https://www.delta.exchange/app/futures/trade/{product_symbol}",
+                "source": "Delta India"
+            })
+        
+        # Sort by trending score (descending) and take top 8
+        trending.sort(key=lambda x: x["trending_score"], reverse=True)
+        return trending[:8], []
+        
+    except Exception as exc:
+        return [], [f"Delta trending coins: {exc}"]
 
 
 def fetch_listings():

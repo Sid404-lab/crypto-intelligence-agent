@@ -1,4 +1,4 @@
-const REPORT_URL = "/data/latest-report.json";
+const API_URL = "/api/report";
 
 const els = {
   updatedAt: document.getElementById("updated-at"),
@@ -13,10 +13,15 @@ const els = {
   aiMorningSummary: document.getElementById("ai-morning-summary"),
   aiWatchList: document.getElementById("ai-watch-list"),
   marketSentiment: document.getElementById("market-sentiment"),
+  trendingList: document.getElementById("trending-list"),
+  refreshBtn: document.getElementById("refresh-btn"),
+  chartContainer: document.getElementById("tradingview-widget"),
 };
 
 let report = null;
 let activeFilter = "All";
+let currentChartSymbol = "BTCUSD";
+let isLoading = false;
 
 function formatUsd(value) {
   return new Intl.NumberFormat("en-US", {
@@ -121,6 +126,63 @@ function renderAiBriefing(aiBriefing) {
   }
 }
 
+function renderTrending(trendingCoins) {
+  if (!trendingCoins || trendingCoins.length === 0) {
+    els.trendingList.innerHTML = `<p class="empty">No trending data available</p>`;
+    return;
+  }
+
+  els.trendingList.innerHTML = trendingCoins
+    .map(
+      (coin) => `
+      <div class="trending-item">
+        <div class="trending-header">
+          <span class="trending-symbol">${coin.symbol}</span>
+          <span class="trending-name">${coin.name}</span>
+        </div>
+        <div class="trending-metrics">
+          <span class="trending-price">${formatUsd(coin.price)}</span>
+          <span class="change ${changeClass(coin.change_24h)}">${formatChange(coin.change_24h)}</span>
+          <span class="trending-volume">Vol ${formatCompact(coin.volume)}</span>
+        </div>
+        <div class="trending-score">
+          <span class="score-label">Trend Score:</span>
+          <span class="score-value">${coin.trending_score}</span>
+        </div>
+      </div>`
+    )
+    .join("");
+}
+
+function initTradingView(symbol = "BTCUSD") {
+  if (els.chartContainer && typeof TradingView !== "undefined") {
+    els.chartContainer.innerHTML = "";
+    new TradingView.widget({
+      width: "100%",
+      height: 400,
+      symbol: symbol,
+      interval: "D",
+      timezone: "Etc/UTC",
+      theme: "dark",
+      style: "1",
+      locale: "en",
+      toolbar_bg: "#1c1a15",
+      enable_publishing: false,
+      allow_symbol_change: true,
+      container_id: "tradingview-widget",
+      hide_side_toolbar: false
+    });
+  }
+}
+
+function setLoading(loading) {
+  isLoading = loading;
+  if (els.refreshBtn) {
+    els.refreshBtn.disabled = loading;
+    els.refreshBtn.classList.toggle("is-loading", loading);
+  }
+}
+
 function renderNews() {
   const query = els.search.value.trim().toLowerCase();
   const rows = report.news.filter((item) => {
@@ -179,8 +241,14 @@ function renderReport() {
   renderMarkets(report.markets);
   renderWatch(report.watch);
   renderAiBriefing(report.ai_briefing);
+  renderTrending(report.trending);
   renderNews();
   renderListings();
+  
+  // Initialize TradingView chart after data loads
+  if (!currentChartSymbol) {
+    initTradingView("BTCUSD");
+  }
 }
 
 function showError(message) {
@@ -205,16 +273,46 @@ els.search.addEventListener("input", () => {
   renderListings();
 });
 
+// Refresh button handler
+if (els.refreshBtn) {
+  els.refreshBtn.addEventListener("click", () => {
+    loadReport();
+  });
+}
+
+// Chart symbol switcher
+document.querySelectorAll(".chart-btn").forEach((button) => {
+  button.addEventListener("click", () => {
+    const symbol = button.dataset.symbol;
+    if (symbol && symbol !== currentChartSymbol) {
+      currentChartSymbol = symbol;
+      
+      // Update active state
+      document.querySelectorAll(".chart-btn").forEach((btn) => {
+        btn.classList.toggle("is-active", btn === button);
+      });
+      
+      // Reload chart with new symbol
+      initTradingView(symbol);
+    }
+  });
+});
+
 async function loadReport() {
+  if (isLoading) return;
+  
+  setLoading(true);
   try {
-    const response = await fetch(REPORT_URL);
+    const response = await fetch(API_URL);
     if (!response.ok) throw new Error(`Could not load report (${response.status})`);
     report = await response.json();
     renderReport();
   } catch (error) {
     showError(
-      `${error.message}. Serve the frontend folder over HTTP (python -m http.server 8080).`
+      `${error.message}. Make sure the backend server is running (py -3 serve.py).`
     );
+  } finally {
+    setLoading(false);
   }
 }
 

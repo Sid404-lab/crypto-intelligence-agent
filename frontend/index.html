@@ -21,13 +21,33 @@
           <p class="subtitle">Crypto morning intelligence</p>
         </div>
         <div class="masthead-meta">
-          <p class="meta-label">Last updated</p>
-          <p id="updated-at" class="meta-value">Loading…</p>
-          <p id="updated-relative" class="meta-sub"></p>
+          <div class="meta-info">
+            <p class="meta-label">Last updated</p>
+            <p id="updated-at" class="meta-value">Loading…</p>
+            <p id="updated-relative" class="meta-sub"></p>
+          </div>
+          <button id="refresh-btn" class="refresh-btn" type="button" aria-label="Refresh data">
+            <span class="refresh-icon">↻</span>
+            <span class="refresh-text">Refresh</span>
+          </button>
         </div>
       </header>
 
       <section class="markets" id="markets" aria-label="Major market prints"></section>
+
+      <section class="panel chart-panel" aria-labelledby="chart-heading">
+        <header class="panel-head panel-head-row">
+          <h2 id="chart-heading">Market Chart</h2>
+          <div class="chart-controls">
+            <button type="button" class="chart-btn is-active" data-symbol="BTCUSD">BTC</button>
+            <button type="button" class="chart-btn" data-symbol="ETHUSD">ETH</button>
+            <button type="button" class="chart-btn" data-symbol="SOLUSD">SOL</button>
+          </div>
+        </header>
+        <div class="chart-container">
+          <div id="tradingview-widget" class="tradingview-widget"></div>
+        </div>
+      </section>
 
       <section class="briefing-row">
         <article class="panel" aria-labelledby="summary-heading">
@@ -56,6 +76,14 @@
             <ul id="ai-watch-list" class="ai-watch-list"></ul>
           </div>
         </div>
+      </section>
+
+      <section class="panel trending-panel" aria-labelledby="trending-heading">
+        <header class="panel-head">
+          <h2 id="trending-heading">Trending Coins</h2>
+          <span class="trending-subtitle">Based on Delta Exchange activity</span>
+        </header>
+        <div id="trending-list" class="trending-list"></div>
       </section>
 
       <section class="panel" aria-labelledby="news-heading">
@@ -101,5 +129,6 @@
       <p id="status" class="status" hidden></p>
     </div>
     <script src="./app.js"></script>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
   </body>
 </html>
