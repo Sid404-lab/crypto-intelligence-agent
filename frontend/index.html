@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AM Wire — Morning Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Source+Sans+3:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="frame">
+      <header class="masthead">
+        <div class="brand">
+          <p class="kicker">Unclassified // Market open</p>
+          <h1>AM Wire</h1>
+          <p class="subtitle">Crypto morning intelligence</p>
+        </div>
+        <div class="masthead-meta">
+          <p class="meta-label">Last updated</p>
+          <p id="updated-at" class="meta-value">Loading…</p>
+          <p id="updated-relative" class="meta-sub"></p>
+        </div>
+      </header>
+
+      <section class="markets" id="markets" aria-label="Major market prints"></section>
+
+      <section class="briefing-row">
+        <article class="panel" aria-labelledby="summary-heading">
+          <header class="panel-head">
+            <h2 id="summary-heading">Morning brief</h2>
+          </header>
+          <p id="summary" class="summary-copy">Loading report…</p>
+        </article>
+        <article class="panel" aria-labelledby="watch-heading">
+          <header class="panel-head">
+            <h2 id="watch-heading">Things to watch</h2>
+          </header>
+          <ol id="watch-list" class="watch-list"></ol>
+        </article>
+      </section>
+
+      <section class="panel ai-briefing-panel" aria-labelledby="ai-briefing-heading">
+        <header class="panel-head">
+          <h2 id="ai-briefing-heading">AI Intelligence Brief</h2>
+          <span id="market-sentiment" class="sentiment-badge">Loading…</span>
+        </header>
+        <div class="ai-briefing-content">
+          <p id="ai-morning-summary" class="ai-summary">Loading AI briefing…</p>
+          <div class="ai-watch-items">
+            <h3>Key Watch Items</h3>
+            <ul id="ai-watch-list" class="ai-watch-list"></ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="news-heading">
+        <header class="panel-head panel-head-row">
+          <h2 id="news-heading">Wire</h2>
+          <div class="controls">
+            <label class="sr-only" for="search">Search news and listings</label>
+            <input
+              id="search"
+              type="search"
+              placeholder="Search news and listings"
+              autocomplete="off"
+            />
+            <div class="filters" role="group" aria-label="News category">
+              <button type="button" class="filter is-active" data-filter="All">All</button>
+              <button type="button" class="filter" data-filter="Markets">Markets</button>
+              <button type="button" class="filter" data-filter="Regulation">Regulation</button>
+              <button type="button" class="filter" data-filter="Listings">Listings</button>
+            </div>
+          </div>
+        </header>
+        <div id="news-list" class="news-list"></div>
+      </section>
+
+      <section class="panel" aria-labelledby="listings-heading">
+        <header class="panel-head">
+          <h2 id="listings-heading">New prints</h2>
+        </header>
+        <div class="table-wrap">
+          <table class="listings">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Symbol</th>
+                <th>Note</th>
+              </tr>
+            </thead>
+            <tbody id="listings-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <p id="status" class="status" hidden></p>
+    </div>
+    <script src="./app.js"></script>
+  </body>
+</html>
