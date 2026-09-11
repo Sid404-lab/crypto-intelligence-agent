@@ -47,4 +47,5 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git add -f data/latest-report.json frontend/data/latest-report.json
           git diff --staged --quiet || git commit -m "Update daily crypto intelligence report [skip ci]"
-          git push
+          git pull --rebase origin main
+          git push origin main

@@ -6,7 +6,7 @@ HEADERS = {
 }
 
 
-def get_json(url, params=None, extra_headers=None, timeout=20):
+def get_json(url, params=None, extra_headers=None, timeout=10):
     headers = dict(HEADERS)
     if extra_headers:
         headers.update(extra_headers)

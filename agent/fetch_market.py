@@ -50,9 +50,10 @@ def fetch_cmc_quotes():
                 CMC_QUOTES_URL,
                 params=params,
                 extra_headers={"X-CMC_PRO_API_KEY": key},
+                timeout=8  # Reduced timeout
             )
         else:
-            payload = get_json(CMC_QUOTES_PUBLIC_URL, params=params)
+            payload = get_json(CMC_QUOTES_PUBLIC_URL, params=params, timeout=8)  # Reduced timeout
         return _cmc_rows(payload), []
     except Exception as exc:
         return {}, [f"CoinMarketCap quotes: {exc}"]
@@ -64,7 +65,7 @@ def fetch_paprika_quotes():
     for coin in COINS:
         url = f"https://api.coinpaprika.com/v1/tickers/{coin['paprika_id']}"
         try:
-            item = get_json(url)
+            item = get_json(url, timeout=8)  # Reduced timeout
             usd = (item.get("quotes") or {}).get("USD") or {}
             price = to_float(usd.get("price"))
             if price is None:
@@ -111,9 +112,13 @@ def fetch_delta_quotes():
     return rows, []
 
 
-def fetch_markets():
+def fetch_markets(fast=False):
     errors = []
-    cmc, cmc_errors = fetch_cmc_quotes()
+    if fast:
+        # Skip CMC for live dashboard to improve response time
+        cmc, cmc_errors = {}, []
+    else:
+        cmc, cmc_errors = fetch_cmc_quotes()
     paprika, paprika_errors = fetch_paprika_quotes()
     delta, delta_errors = fetch_delta_quotes()
     errors.extend(cmc_errors + paprika_errors + delta_errors)

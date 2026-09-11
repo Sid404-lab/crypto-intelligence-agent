@@ -19,6 +19,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
+from concurrent.futures import ThreadPoolExecutor
 
 
 # ============================================================
@@ -185,7 +186,7 @@ class APIHandler(http.server.SimpleHTTPRequestHandler):
 
     def handle_live_report(self):
         """
-        Fetch fresh market/news/listing data
+        Fetch fresh market/news/listing data concurrently
         and generate a fresh AI briefing.
         """
 
@@ -202,56 +203,57 @@ class APIHandler(http.server.SimpleHTTPRequestHandler):
         )
 
         # ----------------------------------------------------
-        # Markets
+        # Concurrent data fetching
         # ----------------------------------------------------
 
-        try:
-            markets, market_errors = fetch_markets()
+        def fetch_markets_safe():
+            try:
+                return fetch_markets(fast=True)
+            except Exception as exc:
+                return None, [f"Market fetch failed: {exc}"]
 
-        except Exception as exc:
-            markets = []
-            market_errors = [
-                f"Market fetch failed: {exc}"
-            ]
+        def fetch_news_safe():
+            try:
+                return fetch_news()
+            except Exception as exc:
+                return None, [f"News fetch failed: {exc}"]
 
-        # ----------------------------------------------------
-        # News
-        # ----------------------------------------------------
+        def fetch_listings_safe():
+            try:
+                return fetch_listings(fast=True)
+            except Exception as exc:
+                return None, [f"Listings fetch failed: {exc}"]
 
-        try:
-            news, news_errors = fetch_news()
+        def fetch_trending_safe():
+            try:
+                return fetch_trending_coins()
+            except Exception as exc:
+                return None, [f"Trending fetch failed: {exc}"]
 
-        except Exception as exc:
-            news = []
-            news_errors = [
-                f"News fetch failed: {exc}"
-            ]
+        # Run all data fetches concurrently with individual timeouts
+        with ThreadPoolExecutor(max_workers=4) as executor:
+            futures = {
+                executor.submit(fetch_markets_safe): "markets",
+                executor.submit(fetch_news_safe): "news",
+                executor.submit(fetch_listings_safe): "listings",
+                executor.submit(fetch_trending_safe): "trending"
+            }
+            
+            results = {}
+            # Wait for each future individually with shorter timeout
+            for future in futures:
+                try:
+                    key = futures[future]
+                    results[key] = future.result(timeout=8)  # 8s timeout per individual call
+                except Exception as exc:
+                    key = futures[future]
+                    results[key] = (None, [f"{key} fetch failed: {exc}"])
 
-        # ----------------------------------------------------
-        # Listings
-        # ----------------------------------------------------
-
-        try:
-            listings, listing_errors = fetch_listings()
-
-        except Exception as exc:
-            listings = []
-            listing_errors = [
-                f"Listings fetch failed: {exc}"
-            ]
-
-        # ----------------------------------------------------
-        # Trending
-        # ----------------------------------------------------
-
-        try:
-            trending, trending_errors = fetch_trending_coins()
-
-        except Exception as exc:
-            trending = []
-            trending_errors = [
-                f"Trending fetch failed: {exc}"
-            ]
+        # Extract results
+        markets, market_errors = results.get("markets", (None, []))
+        news, news_errors = results.get("news", (None, []))
+        listings, listing_errors = results.get("listings", (None, []))
+        trending, trending_errors = results.get("trending", (None, []))
 
         # ----------------------------------------------------
         # AI Briefing
@@ -266,7 +268,9 @@ class APIHandler(http.server.SimpleHTTPRequestHandler):
 
         except Exception as exc:
             ai_briefing = {
-                "summary": "AI briefing unavailable.",
+                "morning_summary": "AI briefing unavailable.",
+                "market_sentiment": "unknown",
+                "things_to_watch": ["AI briefing generation failed"],
                 "error": str(exc)
             }
 

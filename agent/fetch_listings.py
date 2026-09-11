@@ -1,5 +1,6 @@
 import re
 from datetime import datetime, timezone, timedelta
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from config import (
     CMC_LISTINGS_LATEST_PUBLIC_URL,
@@ -15,6 +16,63 @@ from config import (
 from http_util import get_json, to_float
 
 SYMBOL_RE = re.compile(r"^[A-Z0-9]{1,15}$")
+
+# Cache for Delta data to avoid duplicate API calls
+_delta_products_cache = None
+_delta_tickers_cache = None
+_delta_cache_time = None
+CACHE_DURATION = 300  # 5 minutes cache
+
+
+def _get_delta_data():
+    """
+    Fetch Delta Exchange data with caching to avoid duplicate API calls.
+    Returns (products, tickers, errors) tuple.
+    """
+    global _delta_products_cache, _delta_tickers_cache, _delta_cache_time
+    
+    current_time = datetime.now(timezone.utc)
+    
+    # Return cached data if still valid
+    if (_delta_cache_time and 
+        (current_time - _delta_cache_time).total_seconds() < CACHE_DURATION and
+        _delta_products_cache is not None and
+        _delta_tickers_cache is not None):
+        return _delta_products_cache, _delta_tickers_cache, []
+    
+    errors = []
+    items = []
+    tickers = {}
+    
+    # Fetch products with reduced pagination (1 iteration instead of 2)
+    params = {
+        "contract_types": "perpetual_futures",
+        "states": "live",
+        "page_size": 50,  # Reduced page size
+    }
+    
+    try:
+        payload = get_json(f"{DELTA_BASE}/products", params=params, timeout=8)  # Further reduced timeout
+        items = payload.get("result") or []
+    except Exception as exc:
+        errors.append(f"Delta India products: {exc}")
+    
+    # Fetch tickers with reduced timeout
+    try:
+        ticker_params = {
+            "contract_types": "perpetual_futures",
+        }
+        ticker_payload = get_json(f"{DELTA_BASE}/tickers", params=ticker_params, timeout=8)  # Further reduced timeout
+        tickers = {t.get("symbol"): t for t in ticker_payload.get("result") or []}
+    except Exception as exc:
+        errors.append(f"Delta India tickers: {exc}")
+    
+    # Update cache
+    _delta_products_cache = items
+    _delta_tickers_cache = tickers
+    _delta_cache_time = current_time
+    
+    return items, tickers, errors
 
 
 def _iso_day(value):
@@ -45,31 +103,16 @@ def fetch_delta_listings():
     """
     Fetch Delta Exchange India listings, filtering to only products created in the last 7 days.
     Uses Delta's actual created_at timestamp for dynamic filtering.
+    Uses cached data to avoid duplicate API calls.
     """
     errors = []
-    items = []
-    params = {
-        "contract_types": "perpetual_futures",
-        "states": "live",
-        "page_size": 100,
-    }
     
     # Calculate 7-day window from current time (UTC)
     seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
     
-    try:
-        after = None
-        for _ in range(4):
-            if after:
-                params["after"] = after
-            payload = get_json(f"{DELTA_BASE}/products", params=params, timeout=25)
-            batch = payload.get("result") or []
-            items.extend(batch)
-            after = (payload.get("meta") or {}).get("after")
-            if not after or not batch:
-                break
-    except Exception as exc:
-        return [], [f"Delta India products: {exc}"]
+    # Use cached Delta data
+    items, _, delta_errors = _get_delta_data()
+    errors.extend(delta_errors)
 
     ranked = []
     for product in items:
@@ -166,6 +209,7 @@ def fetch_cmc_listings():
                 CMC_NEW_URL,
                 params={"start": 1, "limit": 20, "convert": "USD"},
                 extra_headers={"X-CMC_PRO_API_KEY": key},
+                timeout=10  # Reduced timeout
             )
             listings = _parse_cmc_listings(payload)
             if listings:
@@ -180,6 +224,7 @@ def fetch_cmc_listings():
                 CMC_LISTINGS_LATEST_URL,
                 params={"start": 1, "limit": 20, "convert": "USD", "sort": "date_added", "sort_dir": "desc"},
                 extra_headers={"X-CMC_PRO_API_KEY": key},
+                timeout=10  # Reduced timeout
             )
             listings = _parse_cmc_listings(payload)
             if listings:
@@ -193,6 +238,7 @@ def fetch_cmc_listings():
         payload = get_json(
             CMC_LISTINGS_LATEST_PUBLIC_URL,
             params={"start": 1, "limit": 20, "convert": "USD", "sort": "date_added", "sort_dir": "desc"},
+            timeout=10  # Reduced timeout
         )
         listings = _parse_cmc_listings(payload)
         if listings:
@@ -207,7 +253,7 @@ def fetch_cmc_listings():
 def fetch_paprika_listings():
     errors = []
     try:
-        coins = get_json(COINPAPRIKA_COINS_URL)
+        coins = get_json(COINPAPRIKA_COINS_URL, timeout=10)  # Reduced timeout
     except Exception as exc:
         return [], [f"CoinPaprika list: {exc}"]
 
@@ -221,10 +267,10 @@ def fetch_paprika_listings():
     ]
 
     listings = []
-    for coin in newest[:12]:
+    for coin in newest[:8]:  # Reduced from 12 to 8 for performance
         added_at = None
         try:
-            detail = get_json(COINPAPRIKA_COIN_URL.format(coin_id=coin["id"]), timeout=15)
+            detail = get_json(COINPAPRIKA_COIN_URL.format(coin_id=coin["id"]), timeout=8)  # Reduced timeout
             added_at = _iso_day(detail.get("first_data_at"))
         except Exception as exc:
             errors.append(f"CoinPaprika {coin['symbol']}: {exc}")
@@ -263,35 +309,16 @@ def fetch_trending_coins():
     - Trading volume (liquidity)
     - Normalized combination of both factors
     
+    Uses cached Delta data to avoid duplicate API calls.
+    
     Returns a ranked list of trending coins with their metrics.
     """
     errors = []
+    
     try:
-        # Fetch all live perpetual futures from Delta
-        params = {
-            "contract_types": "perpetual_futures",
-            "states": "live",
-            "page_size": 100,
-        }
-        
-        items = []
-        after = None
-        for _ in range(4):
-            if after:
-                params["after"] = after
-            payload = get_json(f"{DELTA_BASE}/products", params=params, timeout=25)
-            batch = payload.get("result") or []
-            items.extend(batch)
-            after = (payload.get("meta") or {}).get("after")
-            if not after or not batch:
-                break
-        
-        # Fetch ticker data for price and volume information
-        ticker_params = {
-            "contract_types": "perpetual_futures",
-        }
-        ticker_payload = get_json(f"{DELTA_BASE}/tickers", params=ticker_params, timeout=25)
-        tickers = {t.get("symbol"): t for t in ticker_payload.get("result") or []}
+        # Use cached Delta data
+        items, tickers, delta_errors = _get_delta_data()
+        errors.extend(delta_errors)
         
         trending = []
         for product in items:
@@ -347,10 +374,15 @@ def fetch_trending_coins():
         return [], [f"Delta trending coins: {exc}"]
 
 
-def fetch_listings():
+def fetch_listings(fast=False):
     delta, delta_errors = fetch_delta_listings()
-    cmc, cmc_errors = fetch_cmc_listings()
-    paprika, paprika_errors = fetch_paprika_listings()
+    if fast:
+        # Skip CMC and CoinPaprika for live dashboard to improve performance
+        cmc, cmc_errors = [], []
+        paprika, paprika_errors = [], []
+    else:
+        cmc, cmc_errors = fetch_cmc_listings()
+        paprika, paprika_errors = fetch_paprika_listings()
     errors = delta_errors + cmc_errors + paprika_errors
     listings = merge_listings(delta, cmc, paprika)
     if not listings:
