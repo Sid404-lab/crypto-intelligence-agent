@@ -124,6 +124,16 @@ h1 {
   margin: 22px 0;
 }
 
+.error-banner {
+  margin: 18px 0 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(201, 162, 39, 0.65);
+  background: rgba(201, 162, 39, 0.14);
+  color: #e8c85d;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+}
+
 /* Chart Panel */
 .chart-panel {
   margin: 16px 0;

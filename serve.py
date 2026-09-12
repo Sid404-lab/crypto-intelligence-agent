@@ -1,4 +1,8 @@
 """
+/api/report and /api/health are for LOCAL DEVELOPMENT/TESTING ONLY.
+Netlify (static hosting) cannot run this server. Production always reads the
+static data/latest-report.json file committed by GitHub Actions.
+
 serve.py — Dynamic crypto intelligence dashboard server.
 
 Run from the project root:

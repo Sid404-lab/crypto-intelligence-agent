@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AM Wire — Morning Intelligence</title>
+    <title>Pulse — Crypto Trading Intelligence</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -16,9 +16,9 @@
     <div class="frame">
       <header class="masthead">
         <div class="brand">
-          <p class="kicker">Unclassified // Market open</p>
-          <h1>AM Wire</h1>
-          <p class="subtitle">Crypto morning intelligence</p>
+          <p class="kicker">Live // Market watch</p>
+          <h1>Pulse</h1>
+          <p class="subtitle">Real-time crypto trading intelligence.</p>
         </div>
         <div class="masthead-meta">
           <div class="meta-info">
@@ -33,16 +33,14 @@
         </div>
       </header>
 
+      <p id="error-banner" class="error-banner" hidden></p>
+
       <section class="markets" id="markets" aria-label="Major market prints"></section>
 
       <section class="panel chart-panel" aria-labelledby="chart-heading">
         <header class="panel-head panel-head-row">
           <h2 id="chart-heading">Market Chart</h2>
-          <div class="chart-controls">
-            <button type="button" class="chart-btn is-active" data-symbol="BTCUSD">BTC</button>
-            <button type="button" class="chart-btn" data-symbol="ETHUSD">ETH</button>
-            <button type="button" class="chart-btn" data-symbol="SOLUSD">SOL</button>
-          </div>
+          <div id="chart-controls" class="chart-controls"></div>
         </header>
         <div class="chart-container">
           <div id="tradingview-widget" class="tradingview-widget"></div>

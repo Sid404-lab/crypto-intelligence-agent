@@ -2,7 +2,7 @@ import requests
 
 HEADERS = {
     "Accept": "application/json",
-    "User-Agent": "am-wire-morning-intelligence/0.1",
+    "User-Agent": "pulse-crypto-intelligence/1.0",
 }
 
 

@@ -24,7 +24,13 @@ def _load_existing(path: Path) -> dict:
         return json.load(handle)
 
 
-def write_report(markets=None, news=None, listings=None, ai_briefing=None):
+def write_report(
+    markets=None,
+    news=None,
+    listings=None,
+    ai_briefing=None,
+    errors=None,
+):
     existing = _load_existing(REPORT_PATH) or _load_existing(FRONTEND_REPORT_PATH)
     report = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -38,6 +44,7 @@ def write_report(markets=None, news=None, listings=None, ai_briefing=None):
         if listings is not None
         else existing.get("listings", PLACEHOLDER["listings"]),
         "ai_briefing": ai_briefing if ai_briefing is not None else existing.get("ai_briefing", PLACEHOLDER["ai_briefing"]),
+        "errors": errors if errors is not None else existing.get("errors", {}),
     }
     payload = json.dumps(report, indent=2) + "\n"
 

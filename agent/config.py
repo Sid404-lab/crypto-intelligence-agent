@@ -13,6 +13,9 @@ COINS = (
     {"symbol": "BTC", "name": "Bitcoin", "paprika_id": "btc-bitcoin", "tv": "BTCUSD"},
     {"symbol": "ETH", "name": "Ethereum", "paprika_id": "eth-ethereum", "tv": "ETHUSD"},
     {"symbol": "SOL", "name": "Solana", "paprika_id": "sol-solana", "tv": "SOLUSD"},
+    {"symbol": "BNB", "name": "BNB", "paprika_id": "bnb-binance-coin", "tv": "BNBUSD"},
+    {"symbol": "XRP", "name": "XRP", "paprika_id": "xrp-xrp", "tv": "XRPUSD"},
+    {"symbol": "DOGE", "name": "Dogecoin", "paprika_id": "doge-dogecoin", "tv": "DOGEUSD"},
 )
 MAJOR_SYMBOLS = {coin["symbol"] for coin in COINS}
 

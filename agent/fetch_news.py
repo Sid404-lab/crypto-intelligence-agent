@@ -9,7 +9,7 @@ from config import NEWS_FEEDS, NEWS_LIMIT
 
 HEADERS = {
     "Accept": "application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.8",
-    "User-Agent": "am-wire-morning-intelligence/0.1",
+    "User-Agent": "pulse-crypto-intelligence/1.0",
 }
 
 TAG_RE = re.compile(r"<[^>]+>")

@@ -1,4 +1,5 @@
-const API_URL = "/api/report";
+const REPORT_URL = "/data/latest-report.json";
+const LIVE_TICKER_URL = "https://api.india.delta.exchange/v2/tickers";
 
 const els = {
   updatedAt: document.getElementById("updated-at"),
@@ -16,12 +17,15 @@ const els = {
   trendingList: document.getElementById("trending-list"),
   refreshBtn: document.getElementById("refresh-btn"),
   chartContainer: document.getElementById("tradingview-widget"),
+  chartControls: document.getElementById("chart-controls"),
+  errorBanner: document.getElementById("error-banner"),
 };
 
 let report = null;
 let activeFilter = "All";
 let currentChartSymbol = "BTCUSD";
 let isLoading = false;
+let livePriceTimer = null;
 
 function formatUsd(value) {
   return new Intl.NumberFormat("en-US", {
@@ -234,21 +238,104 @@ function renderListings() {
     .join("");
 }
 
+function getChartSymbol(market) {
+  try {
+    const url = new URL(market.chart_url);
+    const symbol = url.searchParams.get("symbol");
+    if (symbol) return symbol;
+  } catch (error) {
+    // Fall back to the market symbol below.
+  }
+  return `${market.symbol}USD`;
+}
+
+function renderChartControls(markets) {
+  if (!els.chartControls) return;
+
+  els.chartControls.innerHTML = markets
+    .map((market) => {
+      const symbol = getChartSymbol(market);
+      return `
+        <button
+          type="button"
+          class="chart-btn ${symbol === currentChartSymbol ? "is-active" : ""}"
+          data-symbol="${symbol}"
+        >${market.symbol}</button>`;
+    })
+    .join("");
+}
+
+async function pollLivePrices() {
+  if (!report) return;
+  try {
+    const res = await fetch(`${LIVE_TICKER_URL}?contract_types=perpetual_futures`);
+    if (!res.ok) return;
+    const data = await res.json();
+    const tickers = {};
+    (data.result || []).forEach((t) => {
+      const sym = (t.underlying_asset_symbol || "").toUpperCase();
+      if (sym) tickers[sym] = t;
+    });
+
+    report.markets.forEach((m) => {
+      const t = tickers[m.symbol];
+      const price = parseFloat(t?.spot_price || t?.mark_price);
+      const change = parseFloat(t?.mark_change_24h ?? t?.ltp_change_24h);
+      if (!isNaN(price)) m.price = price;
+      if (!isNaN(change)) m.change_24h = change;
+    });
+    renderMarkets(report.markets);
+    if (els.updatedRelative) els.updatedRelative.textContent = "Live";
+  } catch (err) {
+    // network/CORS failure — fail silently, static data stays as fallback
+    console.warn("Live price poll failed:", err);
+  }
+}
+
+function startLivePolling() {
+  if (livePriceTimer) clearInterval(livePriceTimer);
+  livePriceTimer = setInterval(pollLivePrices, 15000);
+  pollLivePrices();
+}
+
+function getFailedSources(errors) {
+  if (!errors || typeof errors !== "object") return [];
+
+  return Object.entries(errors)
+    .filter(([, sourceErrors]) => (
+      Array.isArray(sourceErrors) && sourceErrors.some((item) => String(item).trim())
+    ))
+    .map(([source]) => source.charAt(0).toUpperCase() + source.slice(1));
+}
+
+function renderErrorBanner(errors) {
+  if (!els.errorBanner) return;
+
+  const failedSources = getFailedSources(errors);
+  if (!failedSources.length) {
+    els.errorBanner.hidden = true;
+    els.errorBanner.textContent = "";
+    return;
+  }
+
+  els.errorBanner.hidden = false;
+  els.errorBanner.textContent = `Some data sources failed: ${failedSources.join(", ")}`;
+}
+
 function renderReport() {
   els.updatedAt.textContent = formatTime(report.generated_at);
   els.updatedRelative.textContent = relativeTime(report.generated_at);
   els.summary.textContent = report.summary;
+  renderErrorBanner(report.errors);
   renderMarkets(report.markets);
+  renderChartControls(report.markets);
   renderWatch(report.watch);
   renderAiBriefing(report.ai_briefing);
   renderTrending(report.trending);
   renderNews();
   renderListings();
   
-  // Initialize TradingView chart after data loads
-  if (!currentChartSymbol) {
-    initTradingView("BTCUSD");
-  }
+  initTradingView(currentChartSymbol);
 }
 
 function showError(message) {
@@ -280,36 +367,35 @@ if (els.refreshBtn) {
   });
 }
 
-// Chart symbol switcher
-document.querySelectorAll(".chart-btn").forEach((button) => {
-  button.addEventListener("click", () => {
-    const symbol = button.dataset.symbol;
+if (els.chartControls) {
+  els.chartControls.addEventListener("click", (event) => {
+    const button = event.target.closest(".chart-btn");
+    const symbol = button?.dataset.symbol;
     if (symbol && symbol !== currentChartSymbol) {
       currentChartSymbol = symbol;
-      
-      // Update active state
+
       document.querySelectorAll(".chart-btn").forEach((btn) => {
         btn.classList.toggle("is-active", btn === button);
       });
-      
-      // Reload chart with new symbol
+
       initTradingView(symbol);
     }
   });
-});
+}
 
 async function loadReport() {
   if (isLoading) return;
   
   setLoading(true);
   try {
-    const response = await fetch(API_URL);
+    const response = await fetch(REPORT_URL);
     if (!response.ok) throw new Error(`Could not load report (${response.status})`);
     report = await response.json();
     renderReport();
+    startLivePolling();
   } catch (error) {
     showError(
-      `${error.message}. Make sure the backend server is running (py -3 serve.py).`
+      `${error.message}. Make sure data/latest-report.json has been generated.`
     );
   } finally {
     setLoading(false);
