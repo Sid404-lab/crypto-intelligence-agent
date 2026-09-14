@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Source+Sans+3:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=paper-e5-1" />
+    <link rel="stylesheet" href="./styles.css?v=wiring-2" />
     <script>
       try {
         document.documentElement.setAttribute(
@@ -61,7 +61,6 @@
                 <line x1="12" y1="22.08" x2="12" y2="12"/>
               </svg>
               <span class="nav-label">Trade Setup</span>
-              <span class="nav-badge coming-soon-badge">Soon</span>
             </button>
           </li>
           <li>
@@ -132,7 +131,6 @@
                 <line x1="12" y1="17" x2="12.01" y2="17"/>
               </svg>
               <span class="nav-label">Risk Manager</span>
-              <span class="nav-badge coming-soon-badge">Soon</span>
             </button>
           </li>
           <li>
@@ -308,6 +306,30 @@
             </div>
           </section>
 
+          <section class="panel trade-setup-panel" aria-labelledby="trade-setup-heading">
+            <header class="panel-head">
+              <h2 id="trade-setup-heading" class="panel-title">Trade Setup</h2>
+              <span class="panel-subtitle">Same engine as Market Scanner — full signal list</span>
+            </header>
+            <div class="table-wrap">
+              <table class="scanner-table" id="trade-setup-table">
+                <thead>
+                  <tr>
+                    <th>Symbol</th>
+                    <th>Direction</th>
+                    <th>Score</th>
+                    <th>Reasons</th>
+                    <th>Entry Zone</th>
+                    <th>Stop Loss</th>
+                    <th>Targets</th>
+                    <th>R:R</th>
+                  </tr>
+                </thead>
+                <tbody id="trade-setup-body"></tbody>
+              </table>
+            </div>
+          </section>
+
           <section class="panel" aria-labelledby="news-heading">
             <header class="panel-head panel-head-row">
               <h2 id="news-heading" class="panel-title">Wire</h2>
@@ -394,6 +416,27 @@
             </div>
           </section>
 
+          <section class="panel risk-panel" aria-labelledby="risk-heading">
+            <header class="panel-head">
+              <h2 id="risk-heading" class="panel-title">Risk Manager</h2>
+              <span class="panel-subtitle">Exposure across open paper positions</span>
+            </header>
+            <div id="risk-summary" class="stat-grid"></div>
+            <div class="table-wrap">
+              <table class="scanner-table" id="risk-table">
+                <thead>
+                  <tr>
+                    <th>Asset</th>
+                    <th>Side</th>
+                    <th>Size</th>
+                    <th>% of Equity</th>
+                  </tr>
+                </thead>
+                <tbody id="risk-body"></tbody>
+              </table>
+            </div>
+          </section>
+
           <p id="status" class="status" hidden></p>
         </main>
 
@@ -448,26 +491,11 @@
               </div>
 
               <div class="ai-tab-panel" id="ai-setup" role="tabpanel" aria-labelledby="ai-setup-tab" hidden>
-                <div class="coming-soon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 8v4M12 16h.01"/>
-                  </svg>
-                  <p>Top Setup detection requires the Market Scanner engine which is not built yet.</p>
-                  <span class="coming-soon-label">Coming Soon</span>
-                </div>
+                <div id="ai-setup-content"></div>
               </div>
 
               <div class="ai-tab-panel" id="ai-risks" role="tabpanel" aria-labelledby="ai-risks-tab" hidden>
-                <div class="coming-soon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                    <line x1="12" y1="9" x2="12" y2="13"/>
-                    <line x1="12" y1="17" x2="12.01" y2="17"/>
-                  </svg>
-                  <p>Risk analysis requires the Market Scanner engine which is not built yet.</p>
-                  <span class="coming-soon-label">Coming Soon</span>
-                </div>
+                <div id="ai-risk-content"></div>
               </div>
 
               <div class="ai-tab-panel" id="ai-news" role="tabpanel" aria-labelledby="ai-news-tab" hidden>
@@ -535,7 +563,7 @@
 
     <div id="trade-toast" class="trade-toast" hidden></div>
 
-    <script src="./app.js?v=paper-e5-1"></script>
+    <script src="./app.js?v=wiring-2"></script>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
   </body>
 </html>

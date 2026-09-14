@@ -58,11 +58,17 @@ def _parse_datetime(value):
 
 def _category(title):
     text = f" {title.lower()} "
-    if any(word in text for word in (" regulation", " regulator", " sec ", " lawsuit", " court", " congress", " lawmaker", " etf ")):
+    if any(word in text for word in (
+        " regulation", " regulator", " sec ", " sec:", " sec,", " lawsuit",
+        " court", " congress", " lawmaker", " etf ", " clarity",
+        " senate", " republican", " democrat", " treasury", " cftc",
+        " white house", " hearing",
+    )):
         return "Regulation"
     if any(word in text for word in (
         " listing", " listed", " lists ", " will list", " new pair",
-        "adds support for", "now available on", "trading pair", "launches on"
+        "adds support for", "now available on", "trading pair", "launches on",
+        " token", " debut", " lists on", " listed on",
     )):
         return "Listings"
     return "Markets"

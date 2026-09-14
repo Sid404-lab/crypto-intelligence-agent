@@ -51,6 +51,11 @@ const els = {
   navItems: document.querySelectorAll(".nav-item[data-view]"),
   topSetupContent: document.getElementById("top-setup-content"),
   setupBody: document.getElementById("setup-body"),
+  tradeSetupBody: document.getElementById("trade-setup-body"),
+  riskSummary: document.getElementById("risk-summary"),
+  riskBody: document.getElementById("risk-body"),
+  aiSetupContent: document.getElementById("ai-setup-content"),
+  aiRiskContent: document.getElementById("ai-risk-content"),
   timezoneSelect: document.getElementById("timezone-select"),
   themeToggle: document.getElementById("theme-toggle"),
   marketsBtn: document.getElementById("markets-btn"),
@@ -257,6 +262,10 @@ function resetPaperAccount() {
   savePaperAccount(defaultPaperAccount(new Date().toISOString()));
   renderPaperBalance();
   renderPositions();
+  renderRiskPage();
+  renderAiRisk();
+  renderJournal();
+  renderOrders();
 }
 
 // ---- Live prices + positions (E3: Coinbase WS ticks drive P&L) ----
@@ -292,6 +301,8 @@ function handleCoinbaseTick(msg) {
     console.log(`[coinbase] first ${symbol} tick: ${formatUsd(price)}`);
   }
   renderPositions();
+  renderRiskPage();
+  renderAiRisk();
   renderPaperBalance();
 }
 
@@ -426,6 +437,8 @@ function closePosition(id) {
   renderPositions();
   renderJournal();
   renderOrders();
+  renderRiskPage();
+  renderAiRisk();
   const sign = pnl >= 0 ? "+" : "-";
   showTradeToast(`Closed ${pos.side === "SHORT" ? "short" : "long"} ${pos.symbol} @ ${formatUsd(exitPrice)} (${sign}${formatUsd(Math.abs(pnl))}) — balance ${formatUsd(acct.cash)}`);
 }
@@ -664,6 +677,8 @@ function submitTrade() {
   savePaperAccount(acct);
   renderPaperBalance();
   renderOrders();
+  renderRiskPage();
+  renderAiRisk();
   closeTradeModal();
   showTradeToast(`Filled ${tradeSide === "LONG" ? "long" : "short"} ${formatUsd(amount)} ${symbol} @ ${formatUsd(price)} — balance ${formatUsd(acct.cash)}`);
 }
@@ -944,11 +959,11 @@ function renderAiBriefing(aiBriefing) {
   }
 }
 
-function renderTopSetup(topSetup) {
-  if (!els.topSetupContent) return;
+function renderTopSetup(topSetup, targetEl = els.topSetupContent) {
+  if (!targetEl) return;
   
   if (!topSetup || topSetup.note) {
-    els.topSetupContent.innerHTML = `
+    targetEl.innerHTML = `
       <div class="top-setup-empty">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
           <circle cx="12" cy="12" r="10"/>
@@ -968,8 +983,7 @@ function renderTopSetup(topSetup) {
     ? topSetup.targets.map(t => formatUsd(t)).join(" / ")
     : (topSetup.targets ? formatUsd(topSetup.targets) : "—");
 
-  els.topSetupContent.innerHTML = `
-    <div class="top-setup-card">
+  targetEl.innerHTML = `
       <div class="top-setup-header">
         <div>
           <span class="top-setup-symbol">${topSetup.symbol}</span>
@@ -1008,15 +1022,15 @@ function renderTopSetup(topSetup) {
     </div>`;
 }
 
-function renderSetupsTable(setups) {
-  if (!els.setupBody) return;
+function renderSetupsTable(setups, tbodyEl = els.setupBody) {
+  if (!tbodyEl) return;
   
   if (!setups || setups.length === 0) {
-    els.setupBody.innerHTML = `<tr><td colspan="8" class="empty">No setup data available</td></tr>`;
+    tbodyEl.innerHTML = `<tr><td colspan="8" class="empty">No setup data available</td></tr>`;
     return;
   }
 
-  els.setupBody.innerHTML = setups
+  tbodyEl.innerHTML = setups
     .map((s) => {
       const dirClass = s.direction === "LONG" ? "dir-long" : 
                        s.direction === "SHORT" ? "dir-short" : "dir-none";
@@ -1042,6 +1056,79 @@ function renderSetupsTable(setups) {
     .join("");
 }
 
+function computeRiskSummary(acct) {
+  const positions = (acct && acct.positions) || [];
+  const equity = (acct ? Number(acct.cash) : 0) + (acct ? accountUnrealized(acct) : 0);
+  const byAsset = {};
+  positions.forEach((p) => {
+    const size = Number(p.notionalUsd) || 0;
+    if (!byAsset[p.symbol]) byAsset[p.symbol] = { symbol: p.symbol, exposure: 0, count: 0 };
+    byAsset[p.symbol].exposure += size;
+    byAsset[p.symbol].count += 1;
+  });
+  const assets = Object.values(byAsset)
+    .map((a) => ({
+      ...a,
+      pctEquity: equity > 0 ? (a.exposure / equity) * 100 : 0,
+    }))
+    .sort((a, b) => b.exposure - a.exposure);
+  const totalExposure = assets.reduce((sum, a) => sum + a.exposure, 0);
+  return { positions, equity, assets, totalExposure };
+}
+
+function renderRiskPage() {
+  if (!els.riskBody && !els.riskSummary) return;
+  const summary = computeRiskSummary(getPaperAccount());
+  if (els.riskSummary) {
+    els.riskSummary.innerHTML =
+      statCard("Total exposure", formatUsd(summary.totalExposure)) +
+      statCard("Positions", String(summary.positions.length)) +
+      statCard("Equity", formatUsd(summary.equity));
+  }
+  if (!els.riskBody) return;
+  if (!summary.positions.length) {
+    els.riskBody.innerHTML = `<tr><td colspan="4" class="empty">No open positions — nothing at risk right now.</td></tr>`;
+    return;
+  }
+  els.riskBody.innerHTML = summary.positions
+    .map((p) => {
+      const size = Number(p.notionalUsd) || 0;
+      const pct = summary.equity > 0 ? (size / summary.equity) * 100 : 0;
+      const sideClass = p.side === "SHORT" ? "pos-short" : "pos-long";
+      return `
+      <tr>
+        <td><span class="symbol-cell">${p.symbol}</span></td>
+        <td><span class="pos-side ${sideClass}">${p.side}</span></td>
+        <td>${formatUsd(size)}</td>
+        <td>${pct.toFixed(1)}%</td>
+      </tr>`;
+    })
+    .join("");
+}
+
+function renderAiSetupTab() {
+  if (!report || !els.aiSetupContent) return;
+  renderTopSetup(report.top_setup, els.aiSetupContent);
+}
+
+function renderAiRisk() {
+  if (!report || !els.aiRiskContent) return;
+  const summary = computeRiskSummary(getPaperAccount());
+  if (!summary.positions.length) {
+    els.aiRiskContent.innerHTML = `<p class="empty">No open positions — nothing at risk right now.</p>`;
+    return;
+  }
+  const top = summary.assets.slice(0, 3);
+  els.aiRiskContent.innerHTML = `
+    <div class="ai-risk-summary">
+      <div><span>Exposure</span><strong>${formatUsd(summary.totalExposure)}</strong></div>
+      <div><span>Equity</span><strong>${formatUsd(summary.equity)}</strong></div>
+    </div>
+    <ul class="ai-watch-list">
+      ${top.map((a) => `<li>${a.symbol} — ${formatUsd(a.exposure)} (${a.pctEquity.toFixed(1)}% of equity)</li>`).join("")}
+    </ul>`;
+}
+
 function renderReport() {
   els.updatedAt.textContent = formatTime(report.generated_at);
   els.updatedRelative.textContent = relativeTime(report.generated_at);
@@ -1049,6 +1136,10 @@ function renderReport() {
   renderChartControls(report.markets, report.metals);
   renderTopSetup(report.top_setup);
   renderSetupsTable(report.setups);
+  renderSetupsTable(report.setups, els.tradeSetupBody);
+  renderRiskPage();
+  renderAiSetupTab();
+  renderAiRisk();
   renderScanner(report.trending);
   renderNews();
   renderListings();
@@ -1071,24 +1162,20 @@ function showComingSoon(viewName) {
   if (!els.comingSoonModal || !els.comingSoonMessage || !els.comingSoonTitle) return;
   
   const titles = {
-    "trade-setup": "Trade Setup",
     "ai-analysis": "AI Analysis",
     "execute-trade": "Execute Trade",
     "positions": "Positions",
     "orders": "Orders",
     "journal": "Trading Journal",
-    "risk": "Risk Manager",
     "settings": "Settings"
   };
 
   const messages = {
-    "trade-setup": "Trade setup detection requires the Market Scanner engine which is not built yet.",
     "ai-analysis": "Advanced AI analysis tabs (Top Setup, Risks) need the market scanner engine. The Market tab shows real AI briefing data.",
     "execute-trade": "Trade execution requires exchange API integration which is not built yet.",
     "positions": "Positions tracking requires exchange connection which is not built yet.",
     "orders": "Order management requires exchange connection which is not built yet.",
     "journal": "Trading journal is not built yet.",
-    "risk": "Risk manager requires positions data which is not available yet.",
     "settings": "Settings panel is not built yet."
   };
 
@@ -1110,14 +1197,20 @@ function switchView(viewName) {
     item.classList.toggle("is-active", item.dataset.view === viewName);
   });
 
-  const comingSoonViews = ["trade-setup", "ai-analysis", "risk", "settings"];
+  const comingSoonViews = ["ai-analysis", "settings"];
   
   if (comingSoonViews.includes(viewName) && viewName !== "dashboard" && viewName !== "news") {
     showComingSoon(viewName);
     return;
   }
 
-  if (viewName === "positions") {
+  if (viewName === "trade-setup") {
+    const panel = document.querySelector('[aria-labelledby="trade-setup-heading"]');
+    if (panel) panel.scrollIntoView({ behavior: "smooth" });
+  } else if (viewName === "risk") {
+    const panel = document.querySelector('[aria-labelledby="risk-heading"]');
+    if (panel) panel.scrollIntoView({ behavior: "smooth" });
+  } else if (viewName === "positions") {
     const panel = document.querySelector('[aria-labelledby="positions-heading"]');
     if (panel) panel.scrollIntoView({ behavior: "smooth" });
   } else if (viewName === "orders") {
@@ -1467,7 +1560,7 @@ if (els.chartControls) {
 els.navItems.forEach((item) => {
   item.addEventListener("click", (event) => {
     const view = event.currentTarget.dataset.view;
-    if (view === "dashboard" || view === "news" || view === "scanner" || view === "positions" || view === "orders" || view === "journal") {
+    if (view === "dashboard" || view === "news" || view === "scanner" || view === "positions" || view === "orders" || view === "journal" || view === "trade-setup" || view === "risk") {
       switchView(view);
       closeSidebar();
     } else if (view === "execute-trade") {
