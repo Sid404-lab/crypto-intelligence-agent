@@ -30,14 +30,12 @@ DELTA_BASE = "https://api.india.delta.exchange/v2"
 COINPAPRIKA_COINS_URL = "https://api.coinpaprika.com/v1/coins"
 COINPAPRIKA_COIN_URL = "https://api.coinpaprika.com/v1/coins/{coin_id}"
 COINPAPRIKA_TICKER_URL = "https://api.coinpaprika.com/v1/tickers/{coin_id}"
-CMC_QUOTES_URL = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
-CMC_QUOTES_PUBLIC_URL = "https://pro-api.coinmarketcap.com/public-api/v1/cryptocurrency/quotes/latest"
-CMC_NEW_URL = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/new"
-CMC_LISTINGS_LATEST_URL = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest"
-CMC_LISTINGS_LATEST_PUBLIC_URL = "https://pro-api.coinmarketcap.com/public-api/v1/cryptocurrency/listings/latest"
+COINGECKO_BASE_URL = "https://api.coingecko.com/api/v3/"
+COINGECKO_MARKETS_URL = COINGECKO_BASE_URL + "coins/markets"
+COINGECKO_TRENDING_URL = COINGECKO_BASE_URL + "search/trending"
 
 LISTINGS_LIMIT = 12
 
 
-def cmc_api_key():
-    return os.getenv("CMC_API_KEY", "").strip()
+def coingecko_api_key():
+    return os.getenv("COINGECKO_API_KEY", "").strip()

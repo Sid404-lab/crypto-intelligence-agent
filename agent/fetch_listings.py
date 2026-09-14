@@ -3,15 +3,14 @@ from datetime import datetime, timezone, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from config import (
-    CMC_LISTINGS_LATEST_PUBLIC_URL,
-    CMC_LISTINGS_LATEST_URL,
-    CMC_NEW_URL,
+    COINGECKO_MARKETS_URL,
+    COINGECKO_TRENDING_URL,
     COINPAPRIKA_COIN_URL,
     COINPAPRIKA_COINS_URL,
     DELTA_BASE,
     LISTINGS_LIMIT,
     MAJOR_SYMBOLS,
-    cmc_api_key,
+    coingecko_api_key,
 )
 from http_util import get_json, to_float
 
@@ -171,82 +170,50 @@ def fetch_delta_listings():
     return unique, errors
 
 
-def _parse_cmc_listings(payload):
-    """Extract listing items from a CMC listings/new or listings/latest response."""
+def _parse_coingecko_listings(payload):
+    """Extract listing items from CoinGecko /coins/markets response."""
     listings = []
-    for item in payload.get("data") or []:
-        symbol = str(item.get("symbol") or "").upper()
-        name = item.get("name")
-        slug = item.get("slug") or symbol.lower()
-        if not name or not SYMBOL_RE.match(symbol):
-            continue
-        listings.append(
-            _listing(
-                name,
-                symbol,
-                _iso_day(item.get("date_added")),
-                "CoinMarketCap",
-                f"https://coinmarketcap.com/currencies/{slug}/",
+    items = payload if isinstance(payload, list) else (payload.get("data") or [])
+    for item in items:
+        if isinstance(item, dict):
+            symbol = str(item.get("symbol") or "").upper()
+            name = item.get("name")
+            slug = item.get("id") or symbol.lower()
+            if not name or not SYMBOL_RE.match(symbol):
+                continue
+            listings.append(
+                _listing(
+                    name,
+                    symbol,
+                    None,
+                    "CoinGecko",
+                    f"https://www.coingecko.com/en/coins/{slug}",
+                )
             )
-        )
     return listings
 
 
-def fetch_cmc_listings():
+def fetch_coingecko_listings():
     """
-    Fetch recently-added coins from CoinMarketCap using the best available endpoint:
-      1. /v1/cryptocurrency/listings/new  (requires paid API key — Basic plan+)
-      2. /v1/cryptocurrency/listings/latest?sort=date_added&sort_dir=desc  (requires any API key)
-      3. public-api /v1/cryptocurrency/listings/latest?sort=date_added  (keyless, best-effort)
+    Fetch top market-cap coins from CoinGecko Demo API.
+    Uses /coins/markets?vs_currency=usd&order=market_cap_desc.
     """
-    key = cmc_api_key()
     errors = []
-
-    # --- Tier 1: /listings/new (paid key required) ---
-    if key:
-        try:
-            payload = get_json(
-                CMC_NEW_URL,
-                params={"start": 1, "limit": 20, "convert": "USD"},
-                extra_headers={"X-CMC_PRO_API_KEY": key},
-                timeout=10  # Reduced timeout
-            )
-            listings = _parse_cmc_listings(payload)
-            if listings:
-                return listings, []
-            errors.append("CoinMarketCap /listings/new: empty response, trying fallback")
-        except Exception as exc:
-            errors.append(f"CoinMarketCap /listings/new: {exc}")
-
-        # --- Tier 2: /listings/latest sorted by date_added (paid key) ---
-        try:
-            payload = get_json(
-                CMC_LISTINGS_LATEST_URL,
-                params={"start": 1, "limit": 20, "convert": "USD", "sort": "date_added", "sort_dir": "desc"},
-                extra_headers={"X-CMC_PRO_API_KEY": key},
-                timeout=10  # Reduced timeout
-            )
-            listings = _parse_cmc_listings(payload)
-            if listings:
-                return listings, errors
-            errors.append("CoinMarketCap /listings/latest (keyed): empty response")
-        except Exception as exc:
-            errors.append(f"CoinMarketCap /listings/latest (keyed): {exc}")
-
-    # --- Tier 3: public-api keyless (no key needed) ---
+    key = coingecko_api_key()
+    headers = {"x-cg-demo-api-key": key} if key else {}
     try:
         payload = get_json(
-            CMC_LISTINGS_LATEST_PUBLIC_URL,
-            params={"start": 1, "limit": 20, "convert": "USD", "sort": "date_added", "sort_dir": "desc"},
-            timeout=10  # Reduced timeout
+            COINGECKO_MARKETS_URL,
+            params={"vs_currency": "usd", "order": "market_cap_desc", "per_page": 20, "page": 1},
+            extra_headers=headers or None,
+            timeout=10,
         )
-        listings = _parse_cmc_listings(payload)
+        listings = _parse_coingecko_listings(payload)
         if listings:
-            return listings, errors
-        errors.append("CoinMarketCap public /listings/latest: empty response")
+            return listings, []
+        errors.append("CoinGecko /coins/markets: empty response")
     except Exception as exc:
-        errors.append(f"CoinMarketCap public /listings/latest: {exc}")
-
+        errors.append(f"CoinGecko /coins/markets: {exc}")
     return [], errors
 
 
@@ -303,57 +270,44 @@ def merge_listings(*groups):
 
 def fetch_trending_coins():
     """
-    Fetch trending coins from Delta Exchange India based on market activity.
+    Fetch trending coins from Delta Exchange India and CoinGecko Demo API.
+    Uses /search/trending from CoinGecko for trending data.
     Trending score is calculated using:
     - 24h price change (volatility)
     - Trading volume (liquidity)
     - Normalized combination of both factors
-    
+
     Uses cached Delta data to avoid duplicate API calls.
-    
+
     Returns a ranked list of trending coins with their metrics.
     """
     errors = []
-    
+    trending = []
+
     try:
-        # Use cached Delta data
         items, tickers, delta_errors = _get_delta_data()
         errors.extend(delta_errors)
-        
-        trending = []
+
         for product in items:
             product_symbol = product.get("symbol")
             if not product_symbol:
                 continue
-                
             underlying = product.get("underlying_asset") or {}
             symbol = str(underlying.get("symbol") or "").upper()
             name = underlying.get("name") or product.get("description") or symbol
-            
-            # Skip major symbols and invalid symbols
             if symbol in MAJOR_SYMBOLS or not SYMBOL_RE.match(symbol) or not name:
                 continue
-            
-            # Get ticker data for this product
             ticker = tickers.get(product_symbol)
             if not ticker:
                 continue
-            
-            # Extract metrics
             price = to_float(ticker.get("spot_price")) or to_float(ticker.get("mark_price"))
             change_24h = to_float(ticker.get("mark_change_24h")) or to_float(ticker.get("ltp_change_24h")) or 0
             volume = to_float(ticker.get("turnover_usd")) or 0
-            
             if price is None or volume == 0:
                 continue
-            
-            # Calculate trending score
-            # Score combines absolute price change (volatility) and volume (liquidity)
-            # Higher volume with significant price changes = more trending
-            change_score = abs(change_24h)  # Absolute 24h change
-            volume_score = min(volume / 1_000_000, 10)  # Normalize volume (cap at 10M for score)
-            trending_score = (change_score * 2) + volume_score  # Weight change more heavily
-            
+            change_score = abs(change_24h)
+            volume_score = min(volume / 1_000_000, 10)
+            trending_score = (change_score * 2) + volume_score
             trending.append({
                 "symbol": symbol,
                 "name": name,
@@ -363,25 +317,66 @@ def fetch_trending_coins():
                 "trending_score": round(trending_score, 2),
                 "contract": product_symbol,
                 "url": f"https://www.delta.exchange/app/futures/trade/{product_symbol}",
-                "source": "Delta India"
+                "source": "Delta India",
             })
-        
-        # Sort by trending score (descending) and take top 8
-        trending.sort(key=lambda x: x["trending_score"], reverse=True)
-        return trending[:8], []
-        
     except Exception as exc:
-        return [], [f"Delta trending coins: {exc}"]
+        errors.append(f"Delta trending coins: {exc}")
+
+    cg_trending, cg_errors = fetch_coingecko_trending()
+    errors.extend(cg_errors)
+    for coin in cg_trending:
+        if coin["symbol"] not in {t["symbol"] for t in trending}:
+            trending.append(coin)
+
+    trending.sort(key=lambda x: x.get("trending_score", 0) if isinstance(x.get("trending_score"), (int, float)) else 0, reverse=True)
+    return trending[:8], errors
+
+
+def fetch_coingecko_trending():
+    """
+    Fetch trending coins from CoinGecko Demo API using /search/trending.
+    Returns a list of trending coin dicts.
+    """
+    errors = []
+    key = coingecko_api_key()
+    headers = {"x-cg-demo-api-key": key} if key else {}
+    try:
+        payload = get_json(
+            COINGECKO_TRENDING_URL,
+            extra_headers=headers or None,
+            timeout=10,
+        )
+        trending = []
+        for item in payload.get("coins") or []:
+            coin = item.get("item") or {}
+            name = coin.get("name")
+            symbol = str(coin.get("symbol") or "").upper()
+            if not name or not SYMBOL_RE.match(symbol):
+                continue
+            trending.append({
+                "symbol": symbol,
+                "name": name,
+                "price": None,
+                "change_24h": None,
+                "volume": None,
+                "trending_score": coin.get("score", 0),
+                "contract": symbol,
+                "url": f"https://www.coingecko.com/en/coins/{coin.get('id', symbol.lower())}",
+                "source": "CoinGecko",
+            })
+        trending.sort(key=lambda x: x.get("trending_score", 0), reverse=True)
+        return trending[:8], []
+    except Exception as exc:
+        return [], [f"CoinGecko trending: {exc}"]
 
 
 def fetch_listings(fast=False):
     delta, delta_errors = fetch_delta_listings()
     if fast:
-        # Skip CMC and CoinPaprika for live dashboard to improve performance
         cmc, cmc_errors = [], []
         paprika, paprika_errors = [], []
     else:
-        cmc, cmc_errors = fetch_cmc_listings()
+        cmc, cmc_errors = fetch_coingecko_listings()
         paprika, paprika_errors = fetch_paprika_listings()
     errors = delta_errors + cmc_errors + paprika_errors
     listings = merge_listings(delta, cmc, paprika)

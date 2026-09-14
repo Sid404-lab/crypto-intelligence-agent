@@ -24,8 +24,11 @@ PLACEHOLDER = {
 def _load_existing(path: Path) -> dict:
     if not path.exists():
         return {}
-    with path.open(encoding="utf-8") as handle:
-        return json.load(handle)
+    try:
+        with path.open(encoding="utf-8") as handle:
+            return json.load(handle)
+    except (json.JSONDecodeError, ValueError):
+        return {}
 
 
 def write_report(

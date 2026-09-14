@@ -13,7 +13,7 @@ py -3 -m pip install -r requirements.txt
 copy .env.example .env
 ```
 
-Fill in any local keys in `.env`. `GROQ_API_KEY` enables the AI briefing, `CMC_API_KEY` enables CoinMarketCap data, and `TELEGRAM_BOT_TOKEN` plus `TELEGRAM_CHAT_ID` enable push notifications.
+Fill in any local keys in `.env`. `GROQ_API_KEY` enables the AI briefing, `COINGECKO_API_KEY` enables CoinGecko data, and `TELEGRAM_BOT_TOKEN` plus `TELEGRAM_CHAT_ID` enable push notifications.
 
 ## Run The Agent
 
@@ -50,6 +50,6 @@ Production is static hosting only:
 Add these GitHub Actions secrets for production runs:
 
 - `GROQ_API_KEY`
-- `CMC_API_KEY`
+- `COINGECKO_API_KEY`
 - `TELEGRAM_BOT_TOKEN`
 - `TELEGRAM_CHAT_ID`

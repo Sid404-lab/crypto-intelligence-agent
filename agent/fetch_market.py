@@ -1,62 +1,37 @@
-from config import CMC_QUOTES_PUBLIC_URL, CMC_QUOTES_URL, COINS, DELTA_BASE, cmc_api_key
+from config import COINGECKO_MARKETS_URL, COINS, DELTA_BASE, coingecko_api_key
 from http_util import get_json, to_float
 
 
-def _usd_quote(item):
-    quote = item.get("quote")
-    if isinstance(quote, dict):
-        return quote.get("USD") or (next(iter(quote.values())) if quote else None)
-    if isinstance(quote, list):
-        for row in quote:
-            if str(row.get("symbol", "")).upper() == "USD":
-                return row
-        return quote[0] if quote else None
-    return None
-
-
-def _cmc_rows(payload):
-    data = payload.get("data", payload)
+def _coingecko_rows(payload):
     rows = {}
-    if isinstance(data, dict):
-        items = []
-        for value in data.values():
-            items.extend(value if isinstance(value, list) else [value])
-    elif isinstance(data, list):
-        items = data
-    else:
-        items = []
-    for item in items:
-        symbol = str(item.get("symbol", "")).upper()
-        usd = _usd_quote(item) or item
-        price = to_float(usd.get("price"))
+    for item in payload:
+        symbol = str(item.get("symbol") or "").upper()
+        price = to_float(item.get("current_price"))
         if not symbol or price is None:
             continue
         rows[symbol] = {
             "price": price,
-            "change_24h": to_float(usd.get("percent_change_24h")),
-            "volume": to_float(usd.get("volume_24h")),
-            "market_cap": to_float(usd.get("market_cap")),
-            "source": "CoinMarketCap",
+            "change_24h": to_float(item.get("price_change_percentage_24h")),
+            "volume": to_float(item.get("total_volume")),
+            "market_cap": to_float(item.get("market_cap")),
+            "source": "CoinGecko",
         }
     return rows
 
 
-def fetch_cmc_quotes():
-    params = {"symbol": ",".join(coin["symbol"] for coin in COINS), "convert": "USD"}
-    key = cmc_api_key()
+def fetch_coingecko_quotes():
+    key = coingecko_api_key()
+    headers = {"x-cg-demo-api-key": key} if key else {}
     try:
-        if key:
-            payload = get_json(
-                CMC_QUOTES_URL,
-                params=params,
-                extra_headers={"X-CMC_PRO_API_KEY": key},
-                timeout=8  # Reduced timeout
-            )
-        else:
-            payload = get_json(CMC_QUOTES_PUBLIC_URL, params=params, timeout=8)  # Reduced timeout
-        return _cmc_rows(payload), []
+        payload = get_json(
+            COINGECKO_MARKETS_URL,
+            params={"vs_currency": "usd", "order": "market_cap_desc", "per_page": 200, "page": 1},
+            extra_headers=headers or None,
+            timeout=8,
+        )
+        return _coingecko_rows(payload), []
     except Exception as exc:
-        return {}, [f"CoinMarketCap quotes: {exc}"]
+        return {}, [f"CoinGecko quotes: {exc}"]
 
 
 def fetch_paprika_quotes():
@@ -115,10 +90,9 @@ def fetch_delta_quotes():
 def fetch_markets(fast=False):
     errors = []
     if fast:
-        # Skip CMC for live dashboard to improve response time
         cmc, cmc_errors = {}, []
     else:
-        cmc, cmc_errors = fetch_cmc_quotes()
+        cmc, cmc_errors = fetch_coingecko_quotes()
     paprika, paprika_errors = fetch_paprika_quotes()
     delta, delta_errors = fetch_delta_quotes()
     errors.extend(cmc_errors + paprika_errors + delta_errors)
@@ -136,7 +110,7 @@ def fetch_markets(fast=False):
         sources = [
             name
             for name, row in (
-                ("CoinMarketCap", cmc_row),
+                ("CoinGecko", cmc_row),
                 ("CoinPaprika", paprika_row),
                 ("Delta India", delta_row),
             )
