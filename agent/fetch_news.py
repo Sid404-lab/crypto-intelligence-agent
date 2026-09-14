@@ -60,7 +60,10 @@ def _category(title):
     text = f" {title.lower()} "
     if any(word in text for word in (" regulation", " regulator", " sec ", " lawsuit", " court", " congress", " lawmaker", " etf ")):
         return "Regulation"
-    if any(word in text for word in (" listing", " listed", " lists ", " will list", " new pair")):
+    if any(word in text for word in (
+        " listing", " listed", " lists ", " will list", " new pair",
+        "adds support for", "now available on", "trading pair", "launches on"
+    )):
         return "Listings"
     return "Markets"
 

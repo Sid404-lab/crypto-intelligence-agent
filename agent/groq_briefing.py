@@ -58,7 +58,7 @@ Return your response as a JSON object with exactly these keys:
 Be concise, professional, and focus on actionable insights. JSON format only, no other text."""
 
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-120b",
             messages=[
                 {"role": "system", "content": "You are a crypto market analyst. Respond only with valid JSON."},
                 {"role": "user", "content": prompt}
