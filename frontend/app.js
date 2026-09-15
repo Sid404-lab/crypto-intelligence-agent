@@ -33,6 +33,7 @@ const els = {
   refreshBtn: document.getElementById("refresh-btn"),
   chartContainer: document.getElementById("tradingview-widget"),
   chartControls: document.getElementById("chart-controls"),
+  candleCountdown: document.getElementById("candle-countdown"),
   errorBanner: document.getElementById("error-banner"),
   aiMorningSummary: document.getElementById("ai-morning-summary"),
   aiWatchList: document.getElementById("ai-watch-list"),
@@ -75,11 +76,21 @@ const els = {
   assetBody: document.getElementById("asset-body"),
   assetChartBtn: document.getElementById("asset-chart-btn"),
   assetNoChart: document.getElementById("asset-no-chart"),
+  settingsTimezone: document.getElementById("settings-timezone"),
+  settingsThemeToggle: document.getElementById("settings-theme-toggle"),
+  settingsThemeLabel: document.getElementById("settings-theme-label"),
+  settingsBalance: document.getElementById("settings-balance"),
+  settingsPositions: document.getElementById("settings-positions"),
+  settingsEquity: document.getElementById("settings-equity"),
+  settingsReset: document.getElementById("settings-reset"),
+  settingsWatchlist: document.getElementById("settings-watchlist"),
 };
 
 let report = null;
 let activeFilter = "All";
 let currentChartSymbol = "BTCUSD";
+let currentTimeframe = 60; // minutes: 1, 30, 60
+let countdownTimer = null;
 let isLoading = false;
 let reportTimer = null;
 let activeView = "dashboard";
@@ -122,6 +133,15 @@ try {
 } catch (err) {
   // localStorage unavailable — fall back to dark default
 }
+
+const WATCHLIST = [
+  { symbol: "BTC", name: "Bitcoin" },
+  { symbol: "ETH", name: "Ethereum" },
+  { symbol: "SOL", name: "Solana" },
+  { symbol: "BNB", name: "BNB" },
+  { symbol: "XRP", name: "XRP" },
+  { symbol: "DOGE", name: "Dogecoin" },
+];
 
 function formatUsd(value) {
   return new Intl.NumberFormat("en-US", {
@@ -228,6 +248,7 @@ function renderPaperBalance() {
   const equity = acct.cash + accountUnrealized(acct);
   els.paperBalance.textContent = formatUsd(equity);
   renderAccountPanel();
+  renderSettings();
 }
 
 function accountTodayPnl(acct, now) {
@@ -704,6 +725,40 @@ function applyTheme(theme) {
       activeTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"
     );
   }
+  if (els.settingsThemeLabel) els.settingsThemeLabel.textContent = activeTheme === "light" ? "Light" : "Dark";
+}
+
+function syncSettingsDisplay() {
+  if (els.settingsTimezone) els.settingsTimezone.value = activeTimezone;
+  if (els.settingsThemeLabel) els.settingsThemeLabel.textContent = activeTheme === "light" ? "Light" : "Dark";
+}
+
+function renderSettings() {
+  const acct = getPaperAccount();
+  const equity = acct.cash + accountUnrealized(acct);
+  if (els.settingsBalance) els.settingsBalance.textContent = formatUsd(acct.cash);
+  if (els.settingsPositions) els.settingsPositions.textContent = String((acct.positions || []).length);
+  if (els.settingsEquity) els.settingsEquity.textContent = formatUsd(equity);
+  if (els.settingsWatchlist) {
+    els.settingsWatchlist.innerHTML = WATCHLIST.map(
+      (c) => `<li><span class="wl-sym">${c.symbol}</span><span class="wl-name">${c.name}</span></li>`
+    ).join("");
+  }
+  syncSettingsDisplay();
+}
+
+function setTimezone(tz) {
+  if (!TIMEZONES[tz]) return;
+  activeTimezone = tz;
+  try {
+    localStorage.setItem("pulse-timezone", tz);
+  } catch (err) {
+    // localStorage unavailable — selection still applies for this session
+  }
+  if (els.timezoneSelect) els.timezoneSelect.value = tz;
+  syncSettingsDisplay();
+  refreshTimestamps();
+  tickClock();
 }
 
 function relativeTime(iso) {
@@ -769,7 +824,7 @@ function initTradingView(symbol = "BTCUSD") {
       width: "100%",
       height: 400,
       symbol: symbol,
-      interval: "60",
+      interval: String(currentTimeframe),
       timezone: "Etc/UTC",
       theme: "dark",
       style: "1",
@@ -784,6 +839,50 @@ function initTradingView(symbol = "BTCUSD") {
       }
     });
   }
+}
+
+// ---- Candle countdown (Approach 2 overlay fallback) ----
+function getCandleRemainingSec() {
+  const now = new Date();
+  const tf = currentTimeframe;
+  const intervalMs = tf * 60 * 1000;
+  // Use UTC to align with TradingView's Etc/UTC interval
+  const msIntoInterval = (now.getUTCMinutes() % tf) * 60000 + now.getUTCSeconds() * 1000 + now.getUTCMilliseconds();
+  const msRemaining = intervalMs - msIntoInterval;
+  let totalSec = Math.ceil(msRemaining / 1000);
+  if (totalSec <= 0) totalSec = tf * 60;
+  if (totalSec > tf * 60) totalSec = tf * 60;
+  return totalSec;
+}
+
+function formatCountdown(totalSec) {
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+function updateCountdown() {
+  const el = els.candleCountdown || document.getElementById("candle-countdown");
+  if (!el) return;
+  const sec = getCandleRemainingSec();
+  el.textContent = `Closes in: ${formatCountdown(sec)}`;
+}
+
+function startCountdown() {
+  if (countdownTimer) clearInterval(countdownTimer);
+  updateCountdown();
+  countdownTimer = setInterval(updateCountdown, 1000);
+}
+
+function setTimeframe(tf) {
+  const parsed = parseInt(tf, 10);
+  if (![1, 30, 60].includes(parsed)) return;
+  currentTimeframe = parsed;
+  document.querySelectorAll(".chart-tf-btn").forEach((btn) => {
+    btn.classList.toggle("is-active", parseInt(btn.dataset.tf, 10) === parsed);
+  });
+  initTradingView(currentChartSymbol);
+  startCountdown();
 }
 
 function setLoading(loading) {
@@ -1197,7 +1296,7 @@ function switchView(viewName) {
     item.classList.toggle("is-active", item.dataset.view === viewName);
   });
 
-  const comingSoonViews = ["ai-analysis", "settings"];
+  const comingSoonViews = ["ai-analysis"];
   
   if (comingSoonViews.includes(viewName) && viewName !== "dashboard" && viewName !== "news") {
     showComingSoon(viewName);
@@ -1225,6 +1324,12 @@ function switchView(viewName) {
   } else if (viewName === "news") {
     const panel = document.querySelector('[aria-labelledby="news-heading"]');
     if (panel) panel.scrollIntoView({ behavior: "smooth" });
+  } else if (viewName === "settings") {
+    const panel = document.querySelector('[aria-labelledby="settings-heading"]');
+    if (panel) {
+      renderSettings();
+      panel.scrollIntoView({ behavior: "smooth" });
+    }
   } else if (viewName === "dashboard") {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -1557,10 +1662,14 @@ if (els.chartControls) {
   });
 }
 
+document.querySelectorAll(".chart-tf-btn").forEach((btn) => {
+  btn.addEventListener("click", () => setTimeframe(btn.dataset.tf));
+});
+
 els.navItems.forEach((item) => {
   item.addEventListener("click", (event) => {
     const view = event.currentTarget.dataset.view;
-    if (view === "dashboard" || view === "news" || view === "scanner" || view === "positions" || view === "orders" || view === "journal" || view === "trade-setup" || view === "risk") {
+    if (view === "dashboard" || view === "news" || view === "scanner" || view === "positions" || view === "orders" || view === "journal" || view === "trade-setup" || view === "risk" || view === "settings") {
       switchView(view);
       closeSidebar();
     } else if (view === "execute-trade") {
@@ -1780,25 +1889,27 @@ if (els.scrollToNews) {
 
 if (els.timezoneSelect) {
   els.timezoneSelect.value = activeTimezone;
-  els.timezoneSelect.addEventListener("change", (event) => {
-    const tz = event.target.value;
-    if (!TIMEZONES[tz]) return;
-    activeTimezone = tz;
-    try {
-      localStorage.setItem("pulse-timezone", tz);
-    } catch (err) {
-      // localStorage unavailable — selection still applies for this session
-    }
-    refreshTimestamps();
-    tickClock();
-  });
+  els.timezoneSelect.addEventListener("change", (event) => setTimezone(event.target.value));
+}
+if (els.settingsTimezone) {
+  els.settingsTimezone.value = activeTimezone;
+  els.settingsTimezone.addEventListener("change", (event) => setTimezone(event.target.value));
 }
 
 applyTheme(activeTheme);
+syncSettingsDisplay();
 if (els.themeToggle) {
   els.themeToggle.addEventListener("click", () => {
     applyTheme(activeTheme === "dark" ? "light" : "dark");
   });
+}
+if (els.settingsThemeToggle) {
+  els.settingsThemeToggle.addEventListener("click", () => {
+    applyTheme(activeTheme === "dark" ? "light" : "dark");
+  });
+}
+if (els.settingsReset) {
+  els.settingsReset.addEventListener("click", resetPaperAccount);
 }
 
 async function loadReport() {
@@ -1822,9 +1933,11 @@ async function loadReport() {
 loadReport();
 startReportPolling();
 startClock();
+startCountdown();
 connectCoinbase();
 renderPaperBalance();
 renderPositions();
+renderSettings();
 
 if (els.paperReset) {
   els.paperReset.addEventListener("click", resetPaperAccount);
