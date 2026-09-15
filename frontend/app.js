@@ -1,4 +1,5 @@
-const REPORT_URL = "/data/latest-report.json";
+const REPORT_URL = "https://raw.githubusercontent.com/Sid404-lab/crypto-intelligence-agent/main/data/latest-report.json";
+const REPORT_FALLBACK_URL = "/data/latest-report.json";
 
 const els = {
   updatedAt: document.getElementById("updated-at"),
@@ -1917,14 +1918,22 @@ async function loadReport() {
   
   setLoading(true);
   try {
-    const response = await fetch(REPORT_URL);
-    if (!response.ok) throw new Error(`Could not load report (${response.status})`);
+    let response = await fetch(REPORT_URL);
+    if (!response.ok) throw new Error(`Primary fetch failed (${response.status})`);
     report = await response.json();
     renderReport();
-  } catch (error) {
-    showError(
-      `${error.message}. Make sure data/latest-report.json has been generated.`
-    );
+  } catch (primaryError) {
+    console.warn("Primary report fetch failed, trying fallback:", primaryError);
+    try {
+      const fallbackResponse = await fetch(REPORT_FALLBACK_URL);
+      if (!fallbackResponse.ok) throw new Error(`Could not load report (${fallbackResponse.status})`);
+      report = await fallbackResponse.json();
+      renderReport();
+    } catch (fallbackError) {
+      showError(
+        `${fallbackError.message}. Make sure data/latest-report.json has been generated.`
+      );
+    }
   } finally {
     setLoading(false);
   }
