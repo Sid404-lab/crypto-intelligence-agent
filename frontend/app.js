@@ -298,37 +298,54 @@ function resetPaperAccount() {
   renderOrders();
 }
 
-// ---- Live prices + positions (E3: Coinbase WS ticks drive P&L) ----
-const COINBASE_WS_URL = "wss://ws-feed.exchange.coinbase.com";
-const COINBASE_PRODUCTS = ["BTC-USD", "ETH-USD", "SOL-USD", "BNB-USD", "XRP-USD", "DOGE-USD"];
+// ---- Live prices + positions (E3: Delta India WS ticks drive P&L) ----
+// Delta Exchange India public WebSocket — no API key needed for v2/ticker
+// Docs: https://docs.delta.exchange/  — Production WS: wss://socket.india.delta.exchange
+// Channels: v2/ticker for perpetual futures (BTCUSD etc). Metals/commodities/forex stay on Yahoo Finance.
+const DELTA_WS_URL = "wss://socket.india.delta.exchange";
+const DELTA_SYMBOLS = ["BTCUSD", "ETHUSD", "SOLUSD", "BNBUSD", "XRPUSD", "DOGEUSD"];
+const DELTA_SYMBOL_TO_ASSET = {
+  BTCUSD: "BTC",
+  ETHUSD: "ETH",
+  SOLUSD: "SOL",
+  BNBUSD: "BNB",
+  XRPUSD: "XRP",
+  DOGEUSD: "DOGE",
+};
+// Note: Delta only lists perpetual futures for these 6 majors. Full coin-list replacement beyond these 6
+// will be handled in next phase — if a coin has no Delta market we log a warning and fall back to report price.
 const LIVE_TICK_STALE_MS = 60000;
-let coinbaseWs = null;
-let coinbaseReconnectTimer = null;
+let deltaWs = null;
+let deltaReconnectTimer = null;
 const liveTicks = {};
 
-function scheduleCoinbaseReconnect() {
-  if (coinbaseReconnectTimer) clearTimeout(coinbaseReconnectTimer);
-  console.log("[coinbase] reconnecting in 3s…");
-  coinbaseReconnectTimer = setTimeout(connectCoinbase, 3000);
+function scheduleDeltaReconnect() {
+  if (deltaReconnectTimer) clearTimeout(deltaReconnectTimer);
+  console.log("[delta] reconnecting in 3s…");
+  deltaReconnectTimer = setTimeout(connectDelta, 3000);
 }
 
-function handleCoinbaseTick(msg) {
-  if (!msg || msg.type !== "ticker" || !msg.product_id) return;
-  const symbol = String(msg.product_id).split("-")[0].toUpperCase();
-  const price = parseFloat(msg.price);
+function handleDeltaTick(msg) {
+  if (!msg || msg.type !== "v2/ticker" || !msg.symbol) return;
+  const asset = DELTA_SYMBOL_TO_ASSET[msg.symbol];
+  if (!asset) {
+    // Limitation: Delta has no market for this symbol — keep using report price (see note above)
+    console.warn(`[delta] no mapping for ${msg.symbol}, skipping`);
+    return;
+  }
+  const price = parseFloat(msg.mark_price ?? msg.close ?? msg.spot_price);
   if (isNaN(price)) return;
-  const open24 = parseFloat(msg.open_24h);
-  const change = (!isNaN(open24) && open24 !== 0)
-    ? ((price - open24) / open24) * 100
-    : NaN;
-  const firstTick = !liveTicks[symbol];
-  liveTicks[symbol] = {
+  let change = parseFloat(msg.mark_change_24h ?? msg.ltp_change_24h);
+  if (isNaN(change)) change = null;
+  const firstTick = !liveTicks[asset];
+  liveTicks[asset] = {
     price,
-    change_24h: isNaN(change) ? null : change,
+    change_24h: change,
     ts: Date.now(),
+    source: "Delta India",
   };
   if (firstTick) {
-    console.log(`[coinbase] first ${symbol} tick: ${formatUsd(price)}`);
+    console.log(`[delta] first ${asset} tick: ${formatUsd(price)} (Delta India)`);
   }
   renderPositions();
   renderRiskPage();
@@ -336,31 +353,30 @@ function handleCoinbaseTick(msg) {
   renderPaperBalance();
 }
 
-function connectCoinbase() {
+function connectDelta() {
   if (typeof WebSocket === "undefined") {
-    console.warn("[coinbase] WebSocket not supported in this browser");
+    console.warn("[delta] WebSocket not supported in this browser");
     return;
   }
-  if (coinbaseWs && (coinbaseWs.readyState === WebSocket.OPEN || coinbaseWs.readyState === WebSocket.CONNECTING)) {
+  if (deltaWs && (deltaWs.readyState === WebSocket.OPEN || deltaWs.readyState === WebSocket.CONNECTING)) {
     return;
   }
   try {
-    console.log("[coinbase] connecting…");
-    coinbaseWs = new WebSocket(COINBASE_WS_URL);
+    console.log("[delta] connecting…");
+    deltaWs = new WebSocket(DELTA_WS_URL);
   } catch (err) {
-    console.warn("[coinbase] failed to open socket:", err);
-    scheduleCoinbaseReconnect();
+    console.warn("[delta] failed to open socket:", err);
+    scheduleDeltaReconnect();
     return;
   }
-  coinbaseWs.onopen = () => {
-    console.log("[coinbase] connected, subscribing to ticker…");
-    coinbaseWs.send(JSON.stringify({
+  deltaWs.onopen = () => {
+    console.log("[delta] connected, subscribing to v2/ticker…");
+    deltaWs.send(JSON.stringify({
       type: "subscribe",
-      product_ids: COINBASE_PRODUCTS,
-      channels: ["ticker"],
+      payload: { channels: [{ name: "v2/ticker", symbols: DELTA_SYMBOLS }] },
     }));
   };
-  coinbaseWs.onmessage = (event) => {
+  deltaWs.onmessage = (event) => {
     let msg = null;
     try {
       msg = JSON.parse(event.data);
@@ -368,24 +384,29 @@ function connectCoinbase() {
       return;
     }
     if (msg && msg.type === "subscriptions") {
-      console.log("[coinbase] subscription confirmed");
+      console.log("[delta] subscription confirmed", JSON.stringify(msg.channels));
       return;
     }
     if (msg && msg.type === "error") {
-      console.warn("[coinbase] feed error:", event.data);
+      console.warn("[delta] feed error:", event.data);
       return;
     }
-    handleCoinbaseTick(msg);
+    handleDeltaTick(msg);
   };
-  coinbaseWs.onerror = (err) => {
-    console.warn("[coinbase] socket error:", err && err.message ? err.message : err);
-    try { coinbaseWs.close(); } catch (closeErr) { /* onclose will schedule reconnect */ }
+  deltaWs.onerror = (err) => {
+    console.warn("[delta] socket error:", err && err.message ? err.message : err);
+    try { deltaWs.close(); } catch (closeErr) { /* onclose will schedule reconnect */ }
   };
-  coinbaseWs.onclose = (event) => {
-    console.warn(`[coinbase] closed (code ${event && event.code}), will retry…`);
-    scheduleCoinbaseReconnect();
+  deltaWs.onclose = (event) => {
+    console.warn(`[delta] closed (code ${event && event.code}), will retry…`);
+    scheduleDeltaReconnect();
   };
 }
+
+// Backward-compat aliases (in case any other code still references coinbase)
+const connectCoinbase = connectDelta;
+const scheduleCoinbaseReconnect = scheduleDeltaReconnect;
+const handleCoinbaseTick = handleDeltaTick;
 
 function positionLivePrice(symbol, entryPrice) {
   const live = liveTicks[symbol];
@@ -2010,7 +2031,7 @@ loadReport();
 startReportPolling();
 startClock();
 startCountdown();
-connectCoinbase();
+connectDelta();
 renderPaperBalance();
 renderPositions();
 renderSettings();

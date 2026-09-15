@@ -1,4 +1,4 @@
-from config import COINGECKO_MARKETS_URL, COINS, DELTA_BASE, coingecko_api_key
+from config import COINGECKO_MARKETS_URL, COINS, DELTA_BASE, MAJOR_SYMBOLS, coingecko_api_key
 from http_util import get_json, to_float
 
 
@@ -103,16 +103,21 @@ def fetch_markets(fast=False):
         cmc_row = cmc.get(symbol)
         paprika_row = paprika.get(symbol)
         delta_row = delta.get(symbol)
-        primary = cmc_row or paprika_row or delta_row
+        # Prioritize Delta India for crypto majors (per task: crypto only → Delta, metals/forex stay on Yahoo)
+        # If Delta has no market for this coin, note as limitation and fall back to other sources (next phase will replace full list)
+        if not delta_row and symbol in MAJOR_SYMBOLS:
+            # Limitation: Delta India has no perpetual for this coin — will be handled in next phase
+            errors.append(f"{symbol}: no Delta India market (limitation — using fallback)")
+        primary = delta_row or cmc_row or paprika_row
         if not primary:
             errors.append(f"{symbol}: no market data from any source")
             continue
         sources = [
             name
             for name, row in (
+                ("Delta India", delta_row),
                 ("CoinGecko", cmc_row),
                 ("CoinPaprika", paprika_row),
-                ("Delta India", delta_row),
             )
             if row
         ]
