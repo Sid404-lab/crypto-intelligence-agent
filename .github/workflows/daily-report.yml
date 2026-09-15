@@ -1,9 +1,7 @@
 name: Daily Crypto Intelligence Report
 
 on:
-  schedule:
-    - cron: "*/15 * * * *"
-  workflow_dispatch:  # Allow manual triggering
+  workflow_dispatch:  # Allow manual triggering (scheduled via cron-job.org)
 
 jobs:
   generate-report:
