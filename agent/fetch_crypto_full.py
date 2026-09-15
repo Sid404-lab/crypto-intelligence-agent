@@ -70,6 +70,7 @@ def fetch_crypto_full():
                 "volume": volume,
                 "market_cap": None,
                 "chart_symbol": None,
+                "delta_symbol": item.get("symbol"),
             }
         )
 

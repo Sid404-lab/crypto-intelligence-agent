@@ -998,10 +998,24 @@ function renderChartControls(markets, metals = []) {
   if (!els.chartControls) return;
 
   const allMarkets = [...markets, ...metals];
+  const deltaMajors = new Set(["BTC", "ETH", "SOL", "BNB", "XRP", "DOGE"]);
 
   els.chartControls.innerHTML = allMarkets
     .map((market) => {
       const symbol = getChartSymbol(market);
+      const isCrypto = deltaMajors.has(market.symbol);
+      const deltaUrl = isCrypto ? getDeltaTradeUrl(market.symbol) : null;
+      const deltaLink = deltaUrl
+        ? `<a href="${deltaUrl}" target="_blank" rel="noopener" class="chart-delta-link" title="Trade ${market.symbol} on Delta India" aria-label="Trade ${market.symbol} on Delta India" onclick="event.stopPropagation()">Trade ↗</a>`
+        : "";
+      if (deltaUrl) {
+        return `<div class="chart-btn-group">
+        <button
+          type="button"
+          class="chart-btn ${symbol === currentChartSymbol ? "is-active" : ""}"
+          data-symbol="${symbol}"
+        >${market.symbol}</button>${deltaLink}</div>`;
+      }
       return `
         <button
           type="button"
@@ -1128,10 +1142,15 @@ function renderTopSetup(topSetup, targetEl = els.topSetupContent) {
     ? topSetup.targets.map(t => formatUsd(t)).join(" / ")
     : (topSetup.targets ? formatUsd(topSetup.targets) : "—");
 
+  const deltaUrl = getDeltaTradeUrl(topSetup.symbol);
+  const symbolHtml = deltaUrl
+    ? `<a href="${deltaUrl}" target="_blank" rel="noopener" class="top-setup-symbol top-setup-delta-link" title="Trade ${topSetup.symbol} on Delta India" aria-label="Trade ${topSetup.symbol} on Delta India">${topSetup.symbol} ↗</a>`
+    : `<span class="top-setup-symbol">${topSetup.symbol}</span>`;
+
   targetEl.innerHTML = `
       <div class="top-setup-header">
         <div>
-          <span class="top-setup-symbol">${topSetup.symbol}</span>
+          ${symbolHtml}
           <span class="top-setup-direction ${dirClass}">${topSetup.direction}</span>
         </div>
         <span class="top-setup-score">Score: ${topSetup.score}</span>
@@ -1437,6 +1456,18 @@ function mdPrice(p) {
   return p >= 1 ? formatUsd(p) : `$${formatQuote(p)}`;
 }
 
+function getDeltaTradeUrl(symbol, deltaSymbol) {
+  if (!symbol) return null;
+  // Only for crypto — Delta doesn't offer metals/commodities/forex
+  const s = String(symbol).toUpperCase().trim();
+  if (!s) return null;
+  // Use explicit deltaSymbol if provided (e.g., BTCUSD from API), otherwise construct as SYMBOLUSD
+  let product = deltaSymbol ? String(deltaSymbol).toUpperCase().trim() : `${s}USD`;
+  // Ensure it looks like a Delta perpetual (ends with USD); if already contains USD, keep as is
+  if (!product.endsWith("USD") && !product.endsWith("INR")) product = `${s}USD`;
+  return `https://india.delta.exchange/app/trade/${product}`;
+}
+
 function mdCategoryAssets(cat) {
   if (!report) return [];
   if (cat === "crypto") {
@@ -1447,6 +1478,7 @@ function mdCategoryAssets(cat) {
       change: c.change_24h_pct ?? null,
       volume: c.volume ?? null,
       mcap: c.market_cap ?? null,
+      deltaSymbol: c.delta_symbol || null,
     }));
   }
   if (cat === "metals") {
@@ -1511,6 +1543,23 @@ function mdRowHtml(r, cat) {
     chg === null || chg === undefined || isNaN(chg)
       ? `<span class="md-chg">—</span>`
       : `<span class="md-chg ${changeClass(chg)}">${formatChange(chg)}</span>`;
+  // Only crypto gets Delta trade link (Delta doesn't offer metals/commodities/forex)
+  const isCrypto = cat === "crypto" || !!r.deltaSymbol;
+  const deltaUrl = isCrypto ? getDeltaTradeUrl(r.symbol, r.deltaSymbol) : null;
+  const deltaLink = deltaUrl
+    ? `<a href="${deltaUrl}" target="_blank" rel="noopener" class="md-delta-link" title="Trade ${r.symbol} on Delta India" aria-label="Trade ${r.symbol} on Delta India" onclick="event.stopPropagation()">Trade ↗</a>`
+    : "";
+  if (deltaUrl) {
+    return `<div class="md-row-wrap" role="listitem">
+      <button type="button" class="md-row" data-symbol="${r.symbol}">
+        <span class="md-sym">${r.symbol}</span>
+        <span class="md-name">${r.name || ""}</span>
+        <span class="md-price">${mdPrice(r.price)}</span>
+        ${chgHtml}
+      </button>
+      ${deltaLink}
+    </div>`;
+  }
   return `<button type="button" class="md-row" data-symbol="${r.symbol}" role="listitem">
       <span class="md-sym">${r.symbol}</span>
       <span class="md-name">${r.name || ""}</span>
@@ -1519,7 +1568,7 @@ function mdRowHtml(r, cat) {
     </button>`;
 }
 
-function paintAssetRows(listEl, countEl, rows, label) {
+function paintAssetRows(listEl, countEl, rows, label, cat) {
   if (countEl) countEl.textContent = label;
   if (!report) {
     if (listEl) listEl.innerHTML = `<p class="empty">Loading market data…</p>`;
@@ -1527,7 +1576,7 @@ function paintAssetRows(listEl, countEl, rows, label) {
   }
   if (listEl) {
     listEl.innerHTML = rows.length
-      ? rows.map((r) => mdRowHtml(r)).join("")
+      ? rows.map((r) => mdRowHtml(r, cat)).join("")
       : `<p class="empty">No matches.</p>`;
   }
   return rows;
@@ -1563,7 +1612,7 @@ function renderSnapList() {
     rows = mdCategoryAssets(snapCat);
     label = `${rows.length} asset${rows.length === 1 ? "" : "s"}`;
   }
-  snapLastRows = paintAssetRows(els.snapList, els.snapCount, rows, label);
+  snapLastRows = paintAssetRows(els.snapList, els.snapCount, rows, label, snapCat);
 }
 
 function renderSnapshot() {
@@ -1582,7 +1631,7 @@ function renderMdList() {
     rows = mdCategoryAssets(mdCat);
     label = `${rows.length} asset${rows.length === 1 ? "" : "s"}`;
   }
-  mdLastRows = paintAssetRows(els.mdList, els.mdCount, rows, label);
+  mdLastRows = paintAssetRows(els.mdList, els.mdCount, rows, label, mdCat);
 }
 
 function renderMarketsDropdown() {

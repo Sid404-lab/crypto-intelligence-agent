@@ -2512,3 +2512,81 @@ input[type="search"]:focus {
   color: var(--muted);
   font-size: 11px;
 }
+
+/* ===== DELTA TRADE LINKS (crypto only) ===== */
+.md-row-wrap {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  padding: 2px 0;
+}
+
+.md-row-wrap .md-row {
+  border-bottom: none;
+  padding: 9px 4px;
+}
+
+.md-delta-link,
+.chart-delta-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brass);
+  background: rgba(201, 162, 39, 0.08);
+  border: 1px solid var(--brass-dim);
+  padding: 4px 7px;
+  border-radius: 4px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.md-delta-link:hover,
+.chart-delta-link:hover {
+  background: rgba(201, 162, 39, 0.15);
+  border-color: var(--brass);
+  color: var(--brass);
+}
+
+.chart-btn-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.chart-btn-group .chart-btn {
+  margin: 0;
+}
+
+.top-setup-delta-link {
+  color: var(--brass);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--brass-dim);
+  transition: all 0.15s ease;
+}
+
+.top-setup-delta-link:hover {
+  color: var(--brass);
+  border-bottom-color: var(--brass);
+  background: rgba(201, 162, 39, 0.08);
+  border-radius: 2px;
+  padding: 0 2px;
+  margin: 0 -2px;
+}
+
+[data-theme="light"] .md-delta-link,
+[data-theme="light"] .chart-delta-link {
+  background: rgba(201, 162, 39, 0.1);
+  border-color: rgba(201, 162, 39, 0.35);
+}
+
+[data-theme="light"] .top-setup-delta-link {
+  border-bottom-color: rgba(201, 162, 39, 0.35);
+}
