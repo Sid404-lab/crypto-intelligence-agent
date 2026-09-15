@@ -1247,6 +1247,53 @@ input[type="search"]:focus {
   color: var(--text);
 }
 
+.snapshot-head-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.snapshot-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.snapshot-toggle:hover {
+  border-color: var(--brass);
+  color: var(--brass);
+}
+
+.snapshot-toggle svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+}
+
+.snapshot-panel.is-collapsed .snapshot-toggle svg {
+  transform: rotate(-90deg);
+}
+
+.snapshot-panel.is-collapsed .snap-tabs,
+.snapshot-panel.is-collapsed .snap-body {
+  display: none;
+}
+
+.snapshot-panel.is-collapsed .snapshot-head {
+  border-bottom: none;
+  padding-bottom: 16px;
+}
+
 .snap-tabs {
   margin: 12px 20px 0;
   flex-wrap: wrap;

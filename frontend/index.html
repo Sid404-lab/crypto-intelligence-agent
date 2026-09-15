@@ -457,10 +457,15 @@
           <p id="status" class="status" hidden></p>
         </main>
 
-        <aside class="right-panel" id="right-panel" role="complementary" aria-label="Market snapshot and AI analysis">
+        <aside class="right-panel" id="right-panel" role="complementary" aria-label="Market snapshot">
           <div class="snapshot-panel" aria-label="Market snapshot">
             <header class="snapshot-head">
-              <h2 class="snapshot-title">Market Snapshot</h2>
+              <div class="snapshot-head-top">
+                <h2 class="snapshot-title">Market Snapshot</h2>
+                <button type="button" class="snapshot-toggle" id="snapshot-toggle" aria-label="Toggle Market Snapshot" aria-expanded="true" aria-controls="snap-body">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+              </div>
               <div class="snap-tabs" role="tablist" aria-label="Snapshot categories">
                 <button type="button" class="snap-tab is-active" data-snapcat="crypto" role="tab" aria-selected="true">Crypto</button>
                 <button type="button" class="snap-tab" data-snapcat="metals" role="tab" aria-selected="false">Metals</button>
@@ -468,7 +473,7 @@
                 <button type="button" class="snap-tab" data-snapcat="forex" role="tab" aria-selected="false">Forex</button>
               </div>
             </header>
-            <div class="snap-body">
+            <div class="snap-body" id="snap-body">
               <div class="snap-crypto-tools" id="snap-crypto-tools">
                 <div class="md-subfilters" role="group" aria-label="Snapshot crypto filters">
                   <button type="button" data-snapfilter="all" class="is-active">All</button>
@@ -481,52 +486,6 @@
               </div>
               <div id="snap-list" class="md-list" role="list"></div>
               <p id="snap-count" class="md-count" aria-live="polite"></p>
-            </div>
-          </div>
-          <div class="ai-panel">
-            <header class="ai-panel-header">
-              <h2 class="ai-panel-title">AI Market Analysis</h2>
-              <div class="ai-tabs" role="tablist" aria-label="Analysis tabs">
-                <button class="ai-tab is-active" role="tab" aria-selected="true" data-tab="market" aria-controls="ai-market">Market</button>
-                <button class="ai-tab" role="tab" aria-selected="false" data-tab="setup" aria-controls="ai-setup">Top Setup</button>
-                <button class="ai-tab" role="tab" aria-selected="false" data-tab="risks" aria-controls="ai-risks">Risks</button>
-                <button class="ai-tab" role="tab" aria-selected="false" data-tab="news" aria-controls="ai-news">News</button>
-              </div>
-            </header>
-
-            <div class="ai-tab-panels">
-              <div class="ai-tab-panel is-active" id="ai-market" role="tabpanel" aria-labelledby="ai-market-tab">
-                <p id="ai-morning-summary" class="ai-summary">Loading AI briefing…</p>
-                <div class="ai-sentiment-row">
-                  <span class="sentiment-label">Sentiment:</span>
-                  <span id="market-sentiment" class="sentiment-badge">Loading…</span>
-                </div>
-                <div class="ai-watch-items">
-                  <h3>Key Watch Items</h3>
-                  <ul id="ai-watch-list" class="ai-watch-list"></ul>
-                </div>
-              </div>
-
-              <div class="ai-tab-panel" id="ai-setup" role="tabpanel" aria-labelledby="ai-setup-tab" hidden>
-                <div id="ai-setup-content"></div>
-              </div>
-
-              <div class="ai-tab-panel" id="ai-risks" role="tabpanel" aria-labelledby="ai-risks-tab" hidden>
-                <div id="ai-risk-content"></div>
-              </div>
-
-              <div class="ai-tab-panel" id="ai-news" role="tabpanel" aria-labelledby="ai-news-tab" hidden>
-                <div class="coming-soon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14 2 14 8 20 8"/>
-                    <line x1="16" y1="13" x2="8" y2="13"/>
-                    <line x1="16" y1="17" x2="8" y2="17"/>
-                  </svg>
-                  <p>Use the <strong>News & Calendar</strong> section below for real-time wire data.</p>
-                  <button class="btn-link" id="scroll-to-news">Go to Wire →</button>
-                </div>
-              </div>
             </div>
           </div>
         </aside>

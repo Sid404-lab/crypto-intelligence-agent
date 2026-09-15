@@ -1895,6 +1895,15 @@ els.snapTabs.forEach((btn) => {
   });
 });
 
+const snapshotToggle = document.getElementById("snapshot-toggle");
+const snapshotPanel = document.querySelector(".snapshot-panel");
+if (snapshotToggle && snapshotPanel) {
+  snapshotToggle.addEventListener("click", () => {
+    const isCollapsed = snapshotPanel.classList.toggle("is-collapsed");
+    snapshotToggle.setAttribute("aria-expanded", String(!isCollapsed));
+  });
+}
+
 els.snapFilters.forEach((btn) => {
   btn.addEventListener("click", () => {
     snapFilter = btn.dataset.snapfilter;
