@@ -48,8 +48,13 @@ const els = {
   comingSoonMessage: document.getElementById("coming-soon-message"),
   comingSoonTitle: document.getElementById("coming-soon-title"),
   scrollToNews: document.getElementById("scroll-to-news"),
-  aiTabs: document.querySelectorAll(".ai-tab"),
-  aiTabPanels: document.querySelectorAll(".ai-tab-panel"),
+  aiTabs: document.querySelectorAll(".ai-panel .ai-tab"),
+  aiTabPanels: document.querySelectorAll(".ai-panel .ai-tab-panel"),
+  aiFullTabs: document.querySelectorAll(".ai-full-panel .ai-tab"),
+  aiFullPanels: document.querySelectorAll(".ai-full-panel .ai-tab-panel"),
+  aiFullMorningSummary: document.getElementById("ai-full-morning-summary"),
+  aiFullMarketSentiment: document.getElementById("ai-full-market-sentiment"),
+  aiFullWatchList: document.getElementById("ai-full-watch-list"),
   navItems: document.querySelectorAll(".nav-item[data-view]"),
   topSetupContent: document.getElementById("top-setup-content"),
   setupBody: document.getElementById("setup-body"),
@@ -58,6 +63,9 @@ const els = {
   riskBody: document.getElementById("risk-body"),
   aiSetupContent: document.getElementById("ai-setup-content"),
   aiRiskContent: document.getElementById("ai-risk-content"),
+  aiFullSetupContent: document.getElementById("ai-full-setup-content"),
+  aiFullRiskContent: document.getElementById("ai-full-risk-content"),
+  aiFullScrollToNews: document.getElementById("ai-full-scroll-to-news"),
   timezoneSelect: document.getElementById("timezone-select"),
   themeToggle: document.getElementById("theme-toggle"),
   marketsBtn: document.getElementById("markets-btn"),
@@ -1036,27 +1044,43 @@ function renderErrorBanner(errors) {
 
 function renderAiBriefing(aiBriefing) {
   if (!aiBriefing) {
-    els.aiMorningSummary.textContent = "AI briefing not available";
-    els.aiWatchList.innerHTML = "<li>No AI watch items available</li>";
-    els.marketSentiment.textContent = "Unknown";
-    els.marketSentiment.className = "sentiment-badge sentiment-unknown";
+    if (els.aiMorningSummary) els.aiMorningSummary.textContent = "AI briefing not available";
+    if (els.aiWatchList) els.aiWatchList.innerHTML = "<li>No AI watch items available</li>";
+    if (els.marketSentiment) {
+      els.marketSentiment.textContent = "Unknown";
+      els.marketSentiment.className = "sentiment-badge sentiment-unknown";
+    }
+    if (els.aiFullMorningSummary) els.aiFullMorningSummary.textContent = "AI briefing not available";
+    if (els.aiFullWatchList) els.aiFullWatchList.innerHTML = "<li>No AI watch items available</li>";
+    if (els.aiFullMarketSentiment) {
+      els.aiFullMarketSentiment.textContent = "Unknown";
+      els.aiFullMarketSentiment.className = "sentiment-badge sentiment-unknown";
+    }
     return;
   }
 
-  els.aiMorningSummary.textContent = aiBriefing.morning_summary || "AI briefing unavailable";
-  
+  const summary = aiBriefing.morning_summary || "AI briefing unavailable";
   const sentiment = aiBriefing.market_sentiment || "unknown";
-  els.marketSentiment.textContent = sentiment.charAt(0).toUpperCase() + sentiment.slice(1);
-  els.marketSentiment.className = `sentiment-badge sentiment-${sentiment}`;
-
+  const sentimentLabel = sentiment.charAt(0).toUpperCase() + sentiment.slice(1);
+  const sentimentClass = `sentiment-badge sentiment-${sentiment}`;
   const watchItems = aiBriefing.things_to_watch || [];
-  if (watchItems.length === 0) {
-    els.aiWatchList.innerHTML = "<li>No watch items available</li>";
-  } else {
-    els.aiWatchList.innerHTML = watchItems
-      .map((item) => `<li>${item}</li>`)
-      .join("");
+  const watchHtml = watchItems.length === 0
+    ? "<li>No watch items available</li>"
+    : watchItems.map((item) => `<li>${item}</li>`).join("");
+
+  if (els.aiMorningSummary) els.aiMorningSummary.textContent = summary;
+  if (els.marketSentiment) {
+    els.marketSentiment.textContent = sentimentLabel;
+    els.marketSentiment.className = sentimentClass;
   }
+  if (els.aiWatchList) els.aiWatchList.innerHTML = watchHtml;
+
+  if (els.aiFullMorningSummary) els.aiFullMorningSummary.textContent = summary;
+  if (els.aiFullMarketSentiment) {
+    els.aiFullMarketSentiment.textContent = sentimentLabel;
+    els.aiFullMarketSentiment.className = sentimentClass;
+  }
+  if (els.aiFullWatchList) els.aiFullWatchList.innerHTML = watchHtml;
 }
 
 function renderTopSetup(topSetup, targetEl = els.topSetupContent) {
@@ -1207,26 +1231,25 @@ function renderRiskPage() {
 }
 
 function renderAiSetupTab() {
-  if (!report || !els.aiSetupContent) return;
-  renderTopSetup(report.top_setup, els.aiSetupContent);
+  if (!report) return;
+  if (els.aiSetupContent) renderTopSetup(report.top_setup, els.aiSetupContent);
+  if (els.aiFullSetupContent) renderTopSetup(report.top_setup, els.aiFullSetupContent);
 }
 
 function renderAiRisk() {
-  if (!report || !els.aiRiskContent) return;
   const summary = computeRiskSummary(getPaperAccount());
-  if (!summary.positions.length) {
-    els.aiRiskContent.innerHTML = `<p class="empty">No open positions — nothing at risk right now.</p>`;
-    return;
-  }
-  const top = summary.assets.slice(0, 3);
-  els.aiRiskContent.innerHTML = `
+  const riskHtml = !summary.positions.length
+    ? `<p class="empty">No open positions — nothing at risk right now.</p>`
+    : `
     <div class="ai-risk-summary">
       <div><span>Exposure</span><strong>${formatUsd(summary.totalExposure)}</strong></div>
       <div><span>Equity</span><strong>${formatUsd(summary.equity)}</strong></div>
     </div>
     <ul class="ai-watch-list">
-      ${top.map((a) => `<li>${a.symbol} — ${formatUsd(a.exposure)} (${a.pctEquity.toFixed(1)}% of equity)</li>`).join("")}
+      ${summary.assets.slice(0, 3).map((a) => `<li>${a.symbol} — ${formatUsd(a.exposure)} (${a.pctEquity.toFixed(1)}% of equity)</li>`).join("")}
     </ul>`;
+  if (els.aiRiskContent) els.aiRiskContent.innerHTML = riskHtml;
+  if (els.aiFullRiskContent) els.aiFullRiskContent.innerHTML = riskHtml;
 }
 
 function renderReport() {
@@ -1297,7 +1320,7 @@ function switchView(viewName) {
     item.classList.toggle("is-active", item.dataset.view === viewName);
   });
 
-  const comingSoonViews = ["ai-analysis"];
+  const comingSoonViews = [];
   
   if (comingSoonViews.includes(viewName) && viewName !== "dashboard" && viewName !== "news") {
     showComingSoon(viewName);
@@ -1331,6 +1354,18 @@ function switchView(viewName) {
       renderSettings();
       panel.scrollIntoView({ behavior: "smooth" });
     }
+  } else if (viewName === "ai-analysis") {
+    const panel = document.querySelector('[aria-labelledby="ai-analysis-heading"]');
+    if (panel) {
+      if (report) {
+        renderAiBriefing(report.ai_briefing);
+        renderAiSetupTab();
+        renderAiRisk();
+      } else {
+        renderSettings();
+      }
+      panel.scrollIntoView({ behavior: "smooth" });
+    }
   } else if (viewName === "dashboard") {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -1354,6 +1389,25 @@ function switchAiTab(tabName) {
     if (newsSection) {
       newsSection.scrollIntoView({ behavior: "smooth" });
     }
+  }
+}
+
+function switchAiFullTab(tabName) {
+  const tabs = els.aiFullTabs || document.querySelectorAll(".ai-full-panel .ai-tab");
+  const panels = els.aiFullPanels || document.querySelectorAll(".ai-full-panel .ai-tab-panel");
+  tabs.forEach((tab) => {
+    const isActive = tab.dataset.fulltab === tabName;
+    tab.classList.toggle("is-active", isActive);
+    tab.setAttribute("aria-selected", isActive);
+  });
+  panels.forEach((panel) => {
+    const isActive = panel.id === `ai-full-${tabName}`;
+    panel.classList.toggle("is-active", isActive);
+    panel.hidden = !isActive;
+  });
+  if (tabName === "news") {
+    const newsSection = document.querySelector('[aria-labelledby="news-heading"]');
+    if (newsSection) newsSection.scrollIntoView({ behavior: "smooth" });
   }
 }
 
@@ -1670,7 +1724,7 @@ document.querySelectorAll(".chart-tf-btn").forEach((btn) => {
 els.navItems.forEach((item) => {
   item.addEventListener("click", (event) => {
     const view = event.currentTarget.dataset.view;
-    if (view === "dashboard" || view === "news" || view === "scanner" || view === "positions" || view === "orders" || view === "journal" || view === "trade-setup" || view === "risk" || view === "settings") {
+    if (view === "dashboard" || view === "news" || view === "scanner" || view === "positions" || view === "orders" || view === "journal" || view === "trade-setup" || view === "risk" || view === "settings" || view === "ai-analysis") {
       switchView(view);
       closeSidebar();
     } else if (view === "execute-trade") {
@@ -1686,6 +1740,12 @@ els.navItems.forEach((item) => {
 els.aiTabs.forEach((tab) => {
   tab.addEventListener("click", () => {
     switchAiTab(tab.dataset.tab);
+  });
+});
+
+(els.aiFullTabs || document.querySelectorAll(".ai-full-panel .ai-tab")).forEach((tab) => {
+  tab.addEventListener("click", () => {
+    switchAiFullTab(tab.dataset.fulltab);
   });
 });
 
@@ -1885,6 +1945,13 @@ if (els.scrollToNews) {
     if (newsSection) {
       newsSection.scrollIntoView({ behavior: "smooth" });
     }
+  });
+}
+const aiFullScrollBtn = els.aiFullScrollToNews || document.getElementById("ai-full-scroll-to-news");
+if (aiFullScrollBtn) {
+  aiFullScrollBtn.addEventListener("click", () => {
+    const newsSection = document.querySelector('[aria-labelledby="news-heading"]');
+    if (newsSection) newsSection.scrollIntoView({ behavior: "smooth" });
   });
 }
 

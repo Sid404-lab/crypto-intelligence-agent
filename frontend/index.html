@@ -444,6 +444,52 @@
             </div>
           </section>
 
+          <section class="panel ai-full-panel" aria-labelledby="ai-analysis-heading">
+            <header class="panel-head">
+              <h2 id="ai-analysis-heading" class="panel-title">AI Analysis</h2>
+              <span class="panel-subtitle">Full-page market intelligence — same data as dashboard card</span>
+            </header>
+            <div class="ai-panel-header">
+              <div class="ai-tabs" role="tablist" aria-label="Full analysis tabs">
+                <button class="ai-tab is-active" role="tab" aria-selected="true" data-fulltab="market" aria-controls="ai-full-market">Market</button>
+                <button class="ai-tab" role="tab" aria-selected="false" data-fulltab="setup" aria-controls="ai-full-setup">Top Setup</button>
+                <button class="ai-tab" role="tab" aria-selected="false" data-fulltab="risks" aria-controls="ai-full-risks">Risks</button>
+                <button class="ai-tab" role="tab" aria-selected="false" data-fulltab="news" aria-controls="ai-full-news">News</button>
+              </div>
+            </div>
+            <div class="ai-tab-panels">
+              <div class="ai-tab-panel is-active" id="ai-full-market" role="tabpanel">
+                <p id="ai-full-morning-summary" class="ai-summary">Loading AI briefing…</p>
+                <div class="ai-sentiment-row">
+                  <span class="sentiment-label">Sentiment:</span>
+                  <span id="ai-full-market-sentiment" class="sentiment-badge">Loading…</span>
+                </div>
+                <div class="ai-watch-items">
+                  <h3>Key Watch Items</h3>
+                  <ul id="ai-full-watch-list" class="ai-watch-list"></ul>
+                </div>
+              </div>
+              <div class="ai-tab-panel" id="ai-full-setup" role="tabpanel" hidden>
+                <div id="ai-full-setup-content"></div>
+              </div>
+              <div class="ai-tab-panel" id="ai-full-risks" role="tabpanel" hidden>
+                <div id="ai-full-risk-content"></div>
+              </div>
+              <div class="ai-tab-panel" id="ai-full-news" role="tabpanel" hidden>
+                <div class="coming-soon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                  </svg>
+                  <p>Use the <strong>News & Calendar</strong> section below for real-time wire data.</p>
+                  <button class="btn-link" id="ai-full-scroll-to-news">Go to Wire →</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
           <section class="panel settings-panel" aria-labelledby="settings-heading">
             <header class="panel-head">
               <h2 id="settings-heading" class="panel-title">Settings</h2>
