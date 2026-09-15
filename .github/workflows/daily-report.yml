@@ -50,6 +50,6 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add -f data/latest-report.json data/history/*.json frontend/data/latest-report.json
-          git diff --staged --quiet || git commit -m "Update daily crypto intelligence report [skip ci]"
+          git diff --staged --quiet || git commit -m "Update daily crypto intelligence report"
           git pull --rebase origin main
           git push origin main
