@@ -58,7 +58,6 @@ const els = {
   navItems: document.querySelectorAll(".nav-item[data-view]"),
   topSetupContent: document.getElementById("top-setup-content"),
   setupBody: document.getElementById("setup-body"),
-  tradeSetupBody: document.getElementById("trade-setup-body"),
   riskSummary: document.getElementById("risk-summary"),
   riskBody: document.getElementById("risk-body"),
   aiSetupContent: document.getElementById("ai-setup-content"),
@@ -1327,7 +1326,6 @@ function renderReport() {
   renderChartControls(report.markets, report.metals);
   renderTopSetup(report.top_setup);
   renderSetupsTable(report.setups);
-  renderSetupsTable(report.setups, els.tradeSetupBody);
   renderNewTrending(report.new_trending);
   renderRiskPage();
   renderAiSetupTab();
@@ -1396,10 +1394,7 @@ function switchView(viewName) {
     return;
   }
 
-  if (viewName === "trade-setup") {
-    const panel = document.querySelector('[aria-labelledby="trade-setup-heading"]');
-    if (panel) panel.scrollIntoView({ behavior: "smooth" });
-  } else if (viewName === "risk") {
+  if (viewName === "risk") {
     const panel = document.querySelector('[aria-labelledby="risk-heading"]');
     if (panel) panel.scrollIntoView({ behavior: "smooth" });
   } else if (viewName === "positions") {
@@ -1826,7 +1821,7 @@ document.querySelectorAll(".chart-tf-btn").forEach((btn) => {
 els.navItems.forEach((item) => {
   item.addEventListener("click", (event) => {
     const view = event.currentTarget.dataset.view;
-    if (view === "dashboard" || view === "news" || view === "scanner" || view === "positions" || view === "orders" || view === "journal" || view === "trade-setup" || view === "risk" || view === "settings" || view === "ai-analysis") {
+    if (view === "dashboard" || view === "news" || view === "scanner" || view === "positions" || view === "orders" || view === "journal" || view === "risk" || view === "settings" || view === "ai-analysis") {
       switchView(view);
       closeSidebar();
     } else if (view === "execute-trade") {
