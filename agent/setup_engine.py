@@ -23,6 +23,35 @@ def _get_volumes(candles):
     return [c["volume"] for c in candles]
 
 
+def _get_htf_trend(candles_higher):
+    """Determine higher-timeframe trend using same EMA20/EMA50 logic as entry."""
+    if not candles_higher or len(candles_higher) < 50:
+        return None  # insufficient data — don't filter
+    closes = _get_closes(candles_higher)
+    e20_list = ema(closes, 20)
+    e50_list = ema(closes, 50)
+    e20 = e20_list[-1] if e20_list else None
+    e50 = e50_list[-1] if e50_list else None
+    price = closes[-1] if closes else None
+    if price is None or e20 is None or e50 is None:
+        return None
+    if price > e20 > e50:
+        return "bullish"
+    elif price < e20 < e50:
+        return "bearish"
+    else:
+        return "mixed"
+
+
+# Higher-timeframe map: entry -> confirmation
+HTF_MAP = {
+    "5m": "15m",
+    "15m": "1h",
+    "1h": "4h",
+    "4h": None,
+}
+
+
 def evaluate_setup(symbol, candles_by_resolution):
     """
     Evaluate a trade setup for a symbol using 1h candles.
@@ -167,6 +196,45 @@ def evaluate_setup(symbol, candles_by_resolution):
     else:
         direction = "SHORT"
         score = bearish_score
+
+    # === MULTI-TIMEFRAME TREND FILTER (4h confirms 1h) ===
+    # Entry 1h -> HTF 4h; 5m->15m, 15m->1h, 4h->None (no filter)
+    # Policy: Allow if HTF trend is same direction or neutral/mixed/insufficient.
+    # Suppress entirely if HTF trend directly contradicts entry (LONG vs 4h bearish, SHORT vs 4h bullish).
+    # Decision: SUPPRESS (not just penalize) — flagged in response for transparency.
+    if direction != "NO_TRADE":
+        htf_res = HTF_MAP.get("1h")
+        if htf_res:
+            htf_candles = candles_by_resolution.get(htf_res, [])
+            htf_trend = _get_htf_trend(htf_candles)
+            if htf_trend == "bearish" and direction == "LONG":
+                return {
+                    "symbol": symbol,
+                    "direction": "NO_TRADE",
+                    "score": 0,
+                    "reasons": [f"Suppressed: 4h downtrend contradicts LONG (1h {trend})", f"HTF 4h trend: {htf_trend}"],
+                    "entry_zone": None,
+                    "stop_loss": None,
+                    "targets": None,
+                    "risk_reward": None,
+                    "timeframe": "1h",
+                    "invalidation": "HTF trend mismatch",
+                }
+            elif htf_trend == "bullish" and direction == "SHORT":
+                return {
+                    "symbol": symbol,
+                    "direction": "NO_TRADE",
+                    "score": 0,
+                    "reasons": [f"Suppressed: 4h uptrend contradicts SHORT (1h {trend})", f"HTF 4h trend: {htf_trend}"],
+                    "entry_zone": None,
+                    "stop_loss": None,
+                    "targets": None,
+                    "risk_reward": None,
+                    "timeframe": "1h",
+                    "invalidation": "HTF trend mismatch",
+                }
+            elif htf_trend in ("bullish", "bearish") and htf_trend == trend:
+                reasons.append(f"HTF 4h trend confirms {htf_trend}")
 
     # === NON-NO_TRADE CALCULATIONS ===
     entry_zone = None
