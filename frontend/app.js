@@ -312,8 +312,8 @@ const DELTA_SYMBOL_TO_ASSET = {
   XRPUSD: "XRP",
   DOGEUSD: "DOGE",
 };
-// Note: Delta only lists perpetual futures for these 6 majors. Full coin-list replacement beyond these 6
-// will be handled in next phase — if a coin has no Delta market we log a warning and fall back to report price.
+// All Delta crypto perpetuals (186) will be subscribed dynamically after report loads.
+// Keep 6 majors as initial fallback for fast first paint.
 const LIVE_TICK_STALE_MS = 60000;
 let deltaWs = null;
 let deltaReconnectTimer = null;
@@ -327,12 +327,25 @@ function scheduleDeltaReconnect() {
 
 function handleDeltaTick(msg) {
   if (!msg || msg.type !== "v2/ticker" || !msg.symbol) return;
-  const asset = DELTA_SYMBOL_TO_ASSET[msg.symbol];
+  // Try explicit mapping first, then fallback to deriving underlying asset from symbol
+  let asset = DELTA_SYMBOL_TO_ASSET[msg.symbol];
   if (!asset) {
-    // Limitation: Delta has no market for this symbol — keep using report price (see note above)
-    console.warn(`[delta] no mapping for ${msg.symbol}, skipping`);
-    return;
+    const sym = String(msg.symbol).toUpperCase();
+    // For Delta perpetuals, symbol is like BTCUSD, underlying is BTC
+    // Also handle msg.underlying_asset_symbol if present
+    if (msg.underlying_asset_symbol) {
+      asset = String(msg.underlying_asset_symbol).toUpperCase();
+    } else if (sym.endsWith("USD")) {
+      asset = sym.slice(0, -3);
+    } else if (sym.endsWith("INR")) {
+      asset = sym.slice(0, -3);
+    } else {
+      asset = sym;
+    }
+    // Only accept if it's a known crypto from report or majors; otherwise still track it
+    // For any Delta crypto, we will track live price
   }
+  if (!asset) return;
   const price = parseFloat(msg.mark_price ?? msg.close ?? msg.spot_price);
   if (isNaN(price)) return;
   let change = parseFloat(msg.mark_change_24h ?? msg.ltp_change_24h);
@@ -351,6 +364,10 @@ function handleDeltaTick(msg) {
   renderRiskPage();
   renderAiRisk();
   renderPaperBalance();
+  // Re-render Market Snapshot and dropdown if they show crypto (so live Delta prices appear)
+  try { renderSnapList(); } catch {}
+  try { if (mdOpen) renderMdList(); } catch {}
+  // Throttle snapshot re-render for all 186 to avoid jank — still immediate for first ticks
 }
 
 function connectDelta() {
@@ -371,10 +388,22 @@ function connectDelta() {
   }
   deltaWs.onopen = () => {
     console.log("[delta] connected, subscribing to v2/ticker…");
-    deltaWs.send(JSON.stringify({
-      type: "subscribe",
-      payload: { channels: [{ name: "v2/ticker", symbols: DELTA_SYMBOLS }] },
-    }));
+    // Subscribe to all Delta crypto symbols if report already loaded, otherwise fallback to 6 majors
+    let symbolsToSub = DELTA_SYMBOLS;
+    if (report && report.crypto_full && report.crypto_full.length > 0) {
+      const allDeltaSymbols = report.crypto_full.map(c => c.delta_symbol || `${c.symbol}USD`).filter(Boolean);
+      if (allDeltaSymbols.length > 0) symbolsToSub = allDeltaSymbols;
+    }
+    // Delta may have limit per subscribe (e.g., 50), so batch if needed
+    const batchSize = 50;
+    for (let i = 0; i < symbolsToSub.length; i += batchSize) {
+      const batch = symbolsToSub.slice(i, i + batchSize);
+      deltaWs.send(JSON.stringify({
+        type: "subscribe",
+        payload: { channels: [{ name: "v2/ticker", symbols: batch }] },
+      }));
+      console.log(`[delta] subscribed batch ${i/batchSize + 1}: ${batch.length} symbols`);
+    }
   };
   deltaWs.onmessage = (event) => {
     let msg = null;
@@ -401,6 +430,28 @@ function connectDelta() {
     console.warn(`[delta] closed (code ${event && event.code}), will retry…`);
     scheduleDeltaReconnect();
   };
+}
+
+// Subscribe to all Delta symbols after report loads (for live Market Snapshot)
+function subscribeDeltaAll() {
+  if (!deltaWs || deltaWs.readyState !== WebSocket.OPEN) return;
+  if (!report || !report.crypto_full || report.crypto_full.length === 0) return;
+  const allDeltaSymbols = report.crypto_full.map(c => c.delta_symbol || `${c.symbol}USD`).filter(Boolean);
+  // Dedupe and batch (Delta may limit per message)
+  const unique = [...new Set(allDeltaSymbols)];
+  const batchSize = 50;
+  for (let i = 0; i < unique.length; i += batchSize) {
+    const batch = unique.slice(i, i + batchSize);
+    try {
+      deltaWs.send(JSON.stringify({
+        type: "subscribe",
+        payload: { channels: [{ name: "v2/ticker", symbols: batch }] },
+      }));
+      console.log(`[delta] re-subscribed batch ${i/batchSize + 1}: ${batch.length} symbols (all)`);
+    } catch (e) {
+      console.warn("[delta] failed to re-subscribe", e);
+    }
+  }
 }
 
 // Backward-compat aliases (in case any other code still references coinbase)
@@ -1339,6 +1390,8 @@ function renderReport() {
   renderJournal();
   renderOrders();
   if (mdOpen) renderMdList();
+  // After report loads, ensure Delta WS is subscribed to all 186 crypto symbols for live Snapshot
+  try { subscribeDeltaAll(); } catch {}
   
   initTradingView(currentChartSymbol);
 }
@@ -1498,15 +1551,19 @@ function getDeltaTradeUrl(symbol, deltaSymbol) {
 function mdCategoryAssets(cat) {
   if (!report) return [];
   if (cat === "crypto") {
-    return (report.crypto_full || []).map((c) => ({
-      symbol: c.symbol,
-      name: c.name,
-      price: c.price,
-      change: c.change_24h_pct ?? null,
-      volume: c.volume ?? null,
-      mcap: c.market_cap ?? null,
-      deltaSymbol: c.delta_symbol || null,
-    }));
+    return (report.crypto_full || []).map((c) => {
+      const live = liveTicks[c.symbol];
+      const isLive = live && Date.now() - live.ts < LIVE_TICK_STALE_MS;
+      return {
+        symbol: c.symbol,
+        name: c.name,
+        price: isLive ? live.price : c.price,
+        change: isLive && live.change_24h != null ? live.change_24h : (c.change_24h_pct ?? null),
+        volume: c.volume ?? null,
+        mcap: c.market_cap ?? null,
+        deltaSymbol: c.delta_symbol || null,
+      };
+    });
   }
   if (cat === "metals") {
     const bullion = (report.metals || []).map((m) => ({
@@ -1897,10 +1954,16 @@ els.snapTabs.forEach((btn) => {
 
 const snapshotToggle = document.getElementById("snapshot-toggle");
 const snapshotPanel = document.querySelector(".snapshot-panel");
+const rightPanelEl = document.getElementById("right-panel");
+const mainGridEl = document.querySelector(".main-grid");
 if (snapshotToggle && snapshotPanel) {
   snapshotToggle.addEventListener("click", () => {
     const isCollapsed = snapshotPanel.classList.toggle("is-collapsed");
     snapshotToggle.setAttribute("aria-expanded", String(!isCollapsed));
+    if (rightPanelEl) rightPanelEl.classList.toggle("is-collapsed", isCollapsed);
+    if (mainGridEl) mainGridEl.classList.toggle("drawer-collapsed", isCollapsed);
+    // Trigger TradingView resize after drawer animation
+    setTimeout(() => window.dispatchEvent(new Event('resize')), 300);
   });
 }
 

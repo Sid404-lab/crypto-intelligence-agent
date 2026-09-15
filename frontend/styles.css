@@ -16,7 +16,7 @@
   --mono: "IBM Plex Mono", ui-monospace, monospace;
   --sidebar-w: 220px;
   --topbar-h: 56px;
-  --right-panel-w: 320px;
+  --right-panel-w: 360px;
 }
 
 /* Light mode: same brass accent, warm off-white surfaces, dark text */
@@ -1310,7 +1310,40 @@ input[type="search"]:focus {
 
 .snapshot-panel.is-collapsed .snapshot-head {
   border-bottom: none;
-  padding-bottom: 16px;
+  padding: 12px;
+  justify-content: center;
+}
+
+.snapshot-panel.is-collapsed .snapshot-head-top {
+  justify-content: center;
+}
+
+.snapshot-panel.is-collapsed .snapshot-title {
+  display: none;
+}
+
+.snapshot-panel.is-collapsed {
+  width: 60px;
+  min-width: 60px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.right-panel.is-collapsed {
+  width: 60px;
+  min-width: 60px;
+}
+
+.main-grid.drawer-collapsed {
+  grid-template-columns: 1fr 60px;
+}
+
+.main-grid.drawer-collapsed .chart-panel,
+.main-grid.drawer-collapsed .chart-container,
+.main-grid.drawer-collapsed .tradingview-widget {
+  width: 100%;
 }
 
 .snap-tabs {
