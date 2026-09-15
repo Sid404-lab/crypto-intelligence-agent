@@ -13,6 +13,7 @@ PLACEHOLDER = {
     "crypto_full": [],
     "setups": [],
     "top_setup": None,
+    "new_trending": [],
     "ai_briefing": {
         "morning_summary": "AI briefing not available",
         "market_sentiment": "unknown",
@@ -42,6 +43,7 @@ def write_report(
     ai_briefing=None,
     setups=None,
     top_setup=None,
+    new_trending=None,
     errors=None,
 ):
     existing = _load_existing(REPORT_PATH) or _load_existing(FRONTEND_REPORT_PATH)
@@ -78,6 +80,9 @@ def write_report(
         else existing.get("crypto_full", PLACEHOLDER["crypto_full"]),
         "setups": setups if setups is not None else existing.get("setups", PLACEHOLDER["setups"]),
         "top_setup": top_setup if top_setup is not None else existing.get("top_setup", PLACEHOLDER["top_setup"]),
+        "new_trending": new_trending
+        if new_trending is not None
+        else existing.get("new_trending", PLACEHOLDER["new_trending"]),
         "ai_briefing": ai_briefing if ai_briefing is not None else existing.get("ai_briefing", PLACEHOLDER["ai_briefing"]),
         "errors": {
             "markets": [],
@@ -87,6 +92,7 @@ def write_report(
             "metals": [],
             "commodities_forex": [],
             "crypto_full": [],
+            "new_trending": [],
             **(errors if errors is not None else existing.get("errors", {})),
         },
     }

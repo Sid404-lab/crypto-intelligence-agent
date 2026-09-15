@@ -313,6 +313,31 @@
             </div>
           </section>
 
+          <section class="panel new-trending-panel" aria-labelledby="new-trending-heading">
+            <header class="panel-head">
+              <h2 id="new-trending-heading" class="panel-title">New & Trending</h2>
+              <span class="panel-subtitle">Early signals — momentum only, less data available</span>
+            </header>
+            <p class="new-trending-note">Lower-confidence/exploratory signals — 5–10 candle momentum, volume spike, and EMA9 only. No R:R targets; not the vetted strategy. Visually distinct from Top Trade Setup / Market Scanner.</p>
+            <div class="table-wrap">
+              <table class="scanner-table" id="new-trending-table">
+                <thead>
+                  <tr>
+                    <th>Symbol</th>
+                    <th>Flag</th>
+                    <th>Direction</th>
+                    <th>Strength</th>
+                    <th>Price</th>
+                    <th>24h %</th>
+                    <th>Momentum 5c</th>
+                    <th>Vol Spike</th>
+                  </tr>
+                </thead>
+                <tbody id="new-trending-body"></tbody>
+              </table>
+            </div>
+          </section>
+
           <section class="panel trade-setup-panel" aria-labelledby="trade-setup-heading">
             <header class="panel-head">
               <h2 id="trade-setup-heading" class="panel-title">Trade Setup</h2>

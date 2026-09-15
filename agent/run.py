@@ -5,6 +5,7 @@ from fetch_market import fetch_markets
 from fetch_metals import fetch_commodities_forex, fetch_metals
 from fetch_news import fetch_news
 from groq_briefing import generate_ai_briefing
+from new_trending import generate_new_trending
 from send_telegram import send_telegram_briefing
 from setup_engine import scan_all_setups
 from write_report import write_report
@@ -30,6 +31,7 @@ def main():
     crypto_full, crypto_full_errors = fetch_crypto_full()
     ai_briefing = generate_ai_briefing(markets, news, listings)
     setups = scan_all_setups()
+    new_trending, new_trending_errors = generate_new_trending(trending, listings)
 
     # Determine top setup: first with direction != NO_TRADE and score >= 60
     top_setup = None
@@ -46,6 +48,7 @@ def main():
         "metals": metals_errors,
         "commodities_forex": commodities_forex_errors,
         "crypto_full": crypto_full_errors,
+        "new_trending": new_trending_errors,
     }
     path = write_report(
         markets,
@@ -58,6 +61,7 @@ def main():
         ai_briefing=ai_briefing,
         setups=setups,
         top_setup=top_setup,
+        new_trending=new_trending,
         errors=errors,
     )
     print(f"Wrote {path}")
@@ -127,6 +131,16 @@ def main():
             print(f"  ... and {len(crypto_full) - 5} more")
     for error in crypto_full_errors:
         print(f"Crypto full warning: {_safe(error)}")
+    if not new_trending:
+        print("New & Trending: none (no candidates or fetch failed)")
+    else:
+        print(f"New & Trending: {len(new_trending)}")
+        for coin in new_trending[:5]:
+            print(_safe(f"  {coin['symbol']} {coin['badge']} {coin['momentum_direction']} ({coin['why']}) mom {coin['momentum_pct']}% vol x{coin['volume_spike']}"))
+        if len(new_trending) > 5:
+            print(f"  ... and {len(new_trending) - 5} more")
+    for error in new_trending_errors:
+        print(f"New & Trending warning: {_safe(error)}")
     print("\n=== SETUP SCAN RESULTS ===")
     for setup in setups:
         print(f"{setup['symbol']}: {setup['direction']} (score {setup['score']})")

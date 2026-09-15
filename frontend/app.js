@@ -66,6 +66,7 @@ const els = {
   aiFullSetupContent: document.getElementById("ai-full-setup-content"),
   aiFullRiskContent: document.getElementById("ai-full-risk-content"),
   aiFullScrollToNews: document.getElementById("ai-full-scroll-to-news"),
+  newTrendingBody: document.getElementById("new-trending-body"),
   timezoneSelect: document.getElementById("timezone-select"),
   themeToggle: document.getElementById("theme-toggle"),
   marketsBtn: document.getElementById("markets-btn"),
@@ -1220,6 +1221,33 @@ function renderSetupsTable(setups, tbodyEl = els.setupBody) {
     .join("");
 }
 
+function renderNewTrending(list) {
+  const tbody = els.newTrendingBody;
+  if (!tbody) return;
+  if (!list || list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" class="empty">No new or trending coins right now — check back after the next Delta scan.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map((c) => {
+    const dirClass = c.momentum_direction === "LONG" ? "dir-long" : c.momentum_direction === "SHORT" ? "dir-short" : "dir-none";
+    const badgeClass = c.badge === "Early Signal" ? "badge-early" : "badge-momentum";
+    const deltaUrl = getDeltaTradeUrl(c.symbol, c.contract);
+    const deltaLink = deltaUrl ? `<a href="${deltaUrl}" target="_blank" rel="noopener" class="md-delta-link" title="Trade ${c.symbol} on Delta India" aria-label="Trade ${c.symbol} on Delta India" onclick="event.stopPropagation()">Trade ↗</a>` : "";
+    const whyClass = c.why.includes("New listing") ? "flag-new" : c.why.includes("High volume") ? "flag-volume" : "flag-trending";
+    return `
+      <tr>
+        <td><span class="setup-symbol">${c.symbol}</span> ${deltaLink}</td>
+        <td><span class="${whyClass}">${c.why}</span></td>
+        <td><span class="setup-direction ${dirClass}">${c.momentum_direction}</span></td>
+        <td><span class="${badgeClass}">${c.badge}</span><br><span class="top-setup-label">${c.strength}</span></td>
+        <td>${c.price != null ? formatUsd(c.price) : "—"}</td>
+        <td class="${changeClass(c.change_24h)}">${c.change_24h != null ? formatChange(c.change_24h) : "—"}</td>
+        <td>${c.momentum_pct != null ? `${c.momentum_pct > 0 ? "+" : ""}${c.momentum_pct.toFixed(2)}%` : "—"}</td>
+        <td>${c.volume_spike != null ? `${c.volume_spike.toFixed(2)}x` : "—"}</td>
+      </tr>`;
+  }).join("");
+}
+
 function computeRiskSummary(acct) {
   const positions = (acct && acct.positions) || [];
   const equity = (acct ? Number(acct.cash) : 0) + (acct ? accountUnrealized(acct) : 0);
@@ -1300,6 +1328,7 @@ function renderReport() {
   renderTopSetup(report.top_setup);
   renderSetupsTable(report.setups);
   renderSetupsTable(report.setups, els.tradeSetupBody);
+  renderNewTrending(report.new_trending);
   renderRiskPage();
   renderAiSetupTab();
   renderAiRisk();

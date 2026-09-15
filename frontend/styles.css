@@ -2590,3 +2590,69 @@ input[type="search"]:focus {
 [data-theme="light"] .top-setup-delta-link {
   border-bottom-color: rgba(201, 162, 39, 0.35);
 }
+
+/* ===== NEW & TRENDING (distinct from main scanner) ===== */
+.new-trending-panel {
+  border-color: #5b4a8a;
+  background: linear-gradient(180deg, rgba(91, 74, 138, 0.06), transparent 120px), var(--bg-elev);
+}
+
+.new-trending-panel .panel-title {
+  color: #9a8bd5;
+}
+
+.new-trending-note {
+  margin: -8px 0 14px;
+  padding: 8px 12px;
+  background: rgba(91, 74, 138, 0.12);
+  border: 1px solid rgba(91, 74, 138, 0.25);
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.badge-momentum {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 3px;
+  background: rgba(91, 74, 138, 0.18);
+  color: #9a8bd5;
+  border: 1px solid rgba(91, 74, 138, 0.35);
+}
+
+.badge-early {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 3px;
+  background: rgba(201, 162, 39, 0.12);
+  color: var(--brass);
+  border: 1px solid var(--brass-dim);
+}
+
+.flag-new {
+  color: #9a8bd5;
+  font-weight: 600;
+}
+
+.flag-trending {
+  color: var(--up);
+}
+
+.flag-volume {
+  color: #7fae8a;
+}
+
+.new-trending-panel .scanner-table th {
+  background: rgba(91, 74, 138, 0.08);
+}
