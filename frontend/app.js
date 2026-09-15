@@ -1542,10 +1542,13 @@ function getDeltaTradeUrl(symbol, deltaSymbol) {
   let product = deltaSymbol ? String(deltaSymbol).toUpperCase().trim() : `${s}USD`;
   // Ensure it looks like a Delta perpetual (ends with USD); if already contains USD, keep as is
   if (!product.endsWith("USD") && !product.endsWith("INR")) product = `${s}USD`;
-  // Verified 2026-09-15 in real browser: https://india.delta.exchange/app/trade/BTCUSD -> generic markets,
-  // correct per-symbol trading/chart page is https://india.delta.exchange/app/futures/trade/BTCUSD
-  // (or https://www.delta.exchange/app/futures/trade/BTC/BTCUSD) which shows live chart + orderbook
-  return `https://india.delta.exchange/app/futures/trade/${product}`;
+  // Verified 2026-09-15 in real browser:
+  // - https://india.delta.exchange/app/trade/BTCUSD -> generic markets (WRONG)
+  // - https://india.delta.exchange/app/futures/trade/BTCUSD (without underlying) on india -> also wrong (redirects to BTC)
+  // - Correct per-symbol is https://india.delta.exchange/app/futures/trade/BTC/BTCUSD (with underlying) or
+  //   https://www.delta.exchange/app/futures/trade/ETH/ETHUSD — both show live chart + orderbook per symbol
+  // Use india base with underlying segment for correct per-coin routing
+  return `https://india.delta.exchange/app/futures/trade/${s}/${product}`;
 }
 
 function mdCategoryAssets(cat) {
