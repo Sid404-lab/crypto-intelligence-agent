@@ -133,15 +133,6 @@
               <span class="nav-label">Risk Manager</span>
             </button>
           </li>
-          <li>
-            <button class="nav-item" data-view="settings" aria-label="Settings">
-              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-              </svg>
-              <span class="nav-label">Settings</span>
-            </button>
-          </li>
         </ul>
       </nav>
 
@@ -511,58 +502,6 @@
                   <p>Use the <strong>News & Calendar</strong> section below for real-time wire data.</p>
                   <button class="btn-link" id="ai-full-scroll-to-news">Go to Wire →</button>
                 </div>
-              </div>
-            </div>
-          </section>
-
-          <section class="panel settings-panel" aria-labelledby="settings-heading">
-            <header class="panel-head">
-              <h2 id="settings-heading" class="panel-title">Settings</h2>
-            </header>
-            <div class="settings-grid">
-              <div class="settings-card">
-                <h3 class="settings-card-title">Display</h3>
-                <div class="settings-row">
-                  <span class="settings-label">Timezone</span>
-                  <select id="settings-timezone" class="tz-select" aria-label="Display timezone (Settings)">
-                    <option value="IST">IST</option>
-                    <option value="UTC">UTC</option>
-                    <option value="EST">EST</option>
-                    <option value="GMT">GMT</option>
-                  </select>
-                </div>
-                <div class="settings-row">
-                  <span class="settings-label">Theme</span>
-                  <button id="settings-theme-toggle" class="settings-theme-btn" type="button" aria-label="Toggle theme">
-                    <span id="settings-theme-label">Dark</span>
-                    <span class="settings-theme-hint">Switch</span>
-                  </button>
-                </div>
-                <p class="settings-hint">Timezone and theme are stored in localStorage and apply across sessions. Header controls stay in sync.</p>
-              </div>
-
-              <div class="settings-card">
-                <h3 class="settings-card-title">Paper Trading Account</h3>
-                <div class="settings-row">
-                  <span class="settings-label">Balance (Cash)</span>
-                  <span id="settings-balance" class="mono settings-value">$10,000</span>
-                </div>
-                <div class="settings-row">
-                  <span class="settings-label">Open Positions</span>
-                  <span id="settings-positions" class="mono settings-value">0</span>
-                </div>
-                <div class="settings-row">
-                  <span class="settings-label">Equity</span>
-                  <span id="settings-equity" class="mono settings-value">$10,000</span>
-                </div>
-                <button id="settings-reset" class="settings-reset" type="button">Reset Account</button>
-                <p class="settings-hint">Resets paper trading localStorage state back to default $10k and clears all positions (confirmation required).</p>
-              </div>
-
-              <div class="settings-card">
-                <h3 class="settings-card-title">Watchlist</h3>
-                <p class="settings-hint">Read-only for now — editing is backend-controlled via <code>agent/config.py</code>.</p>
-                <ul id="settings-watchlist" class="settings-watchlist" aria-label="Watchlist coins"></ul>
               </div>
             </div>
           </section>
