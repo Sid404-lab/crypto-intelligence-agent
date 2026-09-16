@@ -7,6 +7,7 @@ from fetch_news import fetch_news
 from groq_briefing import generate_ai_briefing
 from new_trending import generate_new_trending
 from send_telegram import send_telegram_briefing
+from setup_alerts import check_and_alert
 from setup_engine import scan_all_setups
 from write_report import write_report
 
@@ -66,6 +67,11 @@ def main():
     )
     print(f"Wrote {path}")
     send_telegram_briefing(ai_briefing)
+    # --- Setup alerts: only crypto, deduped, logged ---
+    try:
+        check_and_alert(setups, new_trending)
+    except Exception as e:
+        print(f"Setup alert error: {e}")
     if markets is None:
         print("Markets: kept previous items (all sources failed)")
     else:
