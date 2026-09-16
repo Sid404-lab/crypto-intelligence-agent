@@ -1,9 +1,0 @@
-[build]
-  publish = "frontend"
-  command = ""
-  ignore = "git diff --quiet HEAD^ HEAD -- . ':!data' ':!frontend/data'"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200

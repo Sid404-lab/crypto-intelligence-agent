@@ -2,7 +2,7 @@
 
 Static morning dashboard for crypto market intelligence.
 
-The production site is static-only. GitHub Actions runs the Python agent, commits `data/latest-report.json`, copies it to `frontend/data/latest-report.json`, and Netlify serves that JSON at `/data/latest-report.json`.
+The production site is static-only. GitHub Actions runs the Python agent, commits `data/latest-report.json`, copies it to `frontend/data/latest-report.json`, and Vercel serves that JSON at `/data/latest-report.json`.
 
 ## Setup
 
@@ -35,7 +35,7 @@ py -3 serve.py
 
 Open http://127.0.0.1:8080
 
-These API routes are local-only. They do not run on Netlify.
+These API routes are local-only. They do not run on Vercel.
 
 ## Production
 
@@ -45,7 +45,7 @@ Production is static hosting only:
 2. The workflow writes `data/latest-report.json`.
 3. The workflow saves a dated copy to `data/history/YYYY-MM-DD.json`.
 4. The workflow copies the latest report to `frontend/data/latest-report.json`.
-5. Netlify publishes the `frontend` folder and the app reads `/data/latest-report.json`.
+5. Vercel publishes the `frontend` folder and the app reads `/data/latest-report.json`.
 
 Add these GitHub Actions secrets for production runs:
 
