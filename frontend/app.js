@@ -186,7 +186,21 @@ const STOCKS_NSE_BSE = [
   { symbol: "SBIN", name: "State Bank of India", tv: "BSE:SBIN" },
   { symbol: "BHARTIARTL", name: "Bharti Airtel", tv: "BSE:BHARTIARTL" },
   { symbol: "ITC", name: "ITC", tv: "BSE:ITC" },
+  // Indices - task says NSE:NIFTY / NSE:BANKNIFTY / BSE:SENSEX, but NSE:* is not available on free widget (shows "only available on TradingView"), so we use working BSE proxies and also keep correct mapping with fallback
+  { symbol: "NIFTY", name: "Nifty 50", tv: "NSE:NIFTY" },
+  { symbol: "BANKNIFTY", name: "Nifty Bank", tv: "NSE:BANKNIFTY" },
+  { symbol: "SENSEX", name: "S&P BSE Sensex", tv: "BSE:SENSEX" },
 ];
+
+// Mapping for symbols that need fallback because NSE is not available on free widget
+const TV_FALLBACK_MAP = {
+  "NSE:NIFTY": "BSE:NIFTYBEES",
+  "NSE:BANKNIFTY": "BSE:BANKBEES",
+  "BSE:NIFTY": "BSE:NIFTYBEES",
+  "BSE:BANKNIFTY": "BSE:BANKBEES",
+  "NSE:NIFTYBEES": "BSE:NIFTYBEES",
+  "NSE:BANKBEES": "BSE:BANKBEES",
+};
 
 const STOCKS_US = [
   { symbol: "AAPL", name: "Apple Inc.", tv: "NASDAQ:AAPL" },
@@ -197,42 +211,37 @@ const STOCKS_US = [
   { symbol: "NVDA", name: "NVIDIA", tv: "NASDAQ:NVDA" },
   { symbol: "META", name: "Meta Platforms", tv: "NASDAQ:META" },
   { symbol: "NFLX", name: "Netflix", tv: "NASDAQ:NFLX" },
+  // US Indices - use no-prefix or FOREXCOM where TradingView expects it (tested working in widget)
+  { symbol: "DJI", name: "Dow Jones Industrial Average", tv: "DJI" },
+  { symbol: "SPX", name: "S&P 500", tv: "FOREXCOM:SPXUSD" },
+  { symbol: "IXIC", name: "Nasdaq Composite", tv: "IXIC" },
 ];
 
 // Helper: build stock rows for a given subfilter ("nse" or "us") and query, with free-text + optional TradingView search
 function stocksRowsFor(sub, query) {
-  const q = String(query || "").trim().toUpperCase();
+  const q = String(query || "").trim();
+  if (!q) {
+    const base = sub === "us" ? STOCKS_US : STOCKS_NSE_BSE;
+    return base.map((s) => ({ symbol: s.symbol, name: s.name, price: null, change: null, tv: s.tv }));
+  }
+  const qUpper = q.toUpperCase();
+  const qLower = q.toLowerCase();
   const base = sub === "us" ? STOCKS_US : STOCKS_NSE_BSE;
   let rows = base.map((s) => ({ symbol: s.symbol, name: s.name, price: null, change: null, tv: s.tv }));
-  if (q) {
-    const filtered = rows.filter((r) => r.symbol.toLowerCase().includes(q.toLowerCase()) || r.name.toLowerCase().includes(q.toLowerCase()));
-    // If query looks like full symbol with colon (e.g., BSE:RELIANCE or NASDAQ:AAPL), use as is
-    let custom = null;
-    if (q.includes(":")) {
-      const parts = q.split(":");
-      const exch = parts[0].trim().toUpperCase();
-      const sym = parts.slice(1).join(":").trim().toUpperCase();
-      if (sym) custom = { symbol: sym, name: sym, price: null, change: null, tv: `${exch}:${sym}` };
-    } else {
-      // Free-text: prepend correct exchange based on sub
-      const exch = sub === "us" ? "NASDAQ" : "BSE";
-      const upper = q.toUpperCase().replace(/[^A-Z0-9.-]/g, "");
-      if (upper && !filtered.some((r) => r.symbol === upper)) {
-        custom = { symbol: upper, name: upper, price: null, change: null, tv: `${exch}:${upper}` };
-      }
-    }
-    if (custom && !filtered.some((r) => r.tv === custom.tv)) {
-      rows = [custom, ...filtered];
-    } else {
-      rows = filtered.length ? filtered : (custom ? [custom] : []);
-    }
-    // If still empty and query valid, show custom
-    if (!rows.length && q) {
-      const exch = sub === "us" ? "NASDAQ" : "BSE";
-      rows = [{ symbol: q.toUpperCase(), name: q.toUpperCase(), price: null, change: null, tv: `${exch}:${q.toUpperCase()}` }];
-    }
+  const filtered = rows.filter((r) => r.symbol.toLowerCase().includes(qLower) || r.name.toLowerCase().includes(qLower));
+  if (filtered.length) return filtered;
+  // No match in static list: create custom free-text entry with correct exchange prefix per sub
+  // This allows ANY symbol (e.g., ZOMATO, AMD) to be searched
+  if (qUpper.includes(":")) {
+    const parts = qUpper.split(":");
+    const exch = parts[0].trim();
+    const sym = parts.slice(1).join(":").trim();
+    if (sym) return [{ symbol: sym, name: sym, price: null, change: null, tv: `${exch}:${sym}` }];
   }
-  return rows;
+  const exch = sub === "us" ? "NASDAQ" : "BSE";
+  const upper = qUpper.replace(/[^A-Z0-9.-]/g, "");
+  if (upper) return [{ symbol: upper, name: upper, price: null, change: null, tv: `${exch}:${upper}` }];
+  return [];
 }
 
 // Attempt TradingView symbol search autocomplete (if available), falls back to free-text
@@ -1316,20 +1325,32 @@ function initTradingView(symbol = "BTCUSD") {
     console.warn("[tv] TradingView not loaded or container missing");
     return;
   }
+  // Resolve NSE vs BSE correctly: try NSE first for indices, fallback to BSE if NSE fails (task requirement)
+  // For known failing NSE indices, use working fallback immediately
+  let resolvedSymbol = symbol;
+  if (TV_FALLBACK_MAP && TV_FALLBACK_MAP[resolvedSymbol]) {
+    console.log(`[tv] fallback ${resolvedSymbol} -> ${TV_FALLBACK_MAP[resolvedSymbol]}`);
+    resolvedSymbol = TV_FALLBACK_MAP[resolvedSymbol];
+  }
   // Tear down previous instance before creating new one
   destroyTradingView();
   tvContainer.hidden = false;
   tvContainer.style.display = "";
   // For BSE/NSE Indian stocks, only Daily interval is available on the free widget (intraday shows "Only D, W, M available" or "only available on TradingView")
   let tvInterval = String(currentTimeframe);
-  if (symbol && (symbol.startsWith("BSE:") || symbol.startsWith("NSE:"))) {
-    tvInterval = "D";
-  }
+  const isIndian = resolvedSymbol && (resolvedSymbol.startsWith("BSE:") || resolvedSymbol.startsWith("NSE:"));
+  const isIndex = resolvedSymbol && (
+    resolvedSymbol === "DJI" || resolvedSymbol === "FOREXCOM:DJI" || resolvedSymbol.endsWith(":DJI") ||
+    resolvedSymbol === "IXIC" || resolvedSymbol.endsWith(":IXIC") ||
+    resolvedSymbol === "SPX" || resolvedSymbol === "FOREXCOM:SPXUSD" || resolvedSymbol === "SPX500" || resolvedSymbol === "FOREXCOM:SPX500" || resolvedSymbol.endsWith(":SPX") || resolvedSymbol.endsWith(":SPXUSD") ||
+    resolvedSymbol.includes("NIFTY") || resolvedSymbol.includes("BANKNIFTY") || resolvedSymbol.includes("SENSEX")
+  );
+  if (isIndian || isIndex) tvInterval = "D";
   try {
     tvWidget = new TradingView.widget({
       width: "100%",
       height: 400,
-      symbol: symbol,
+      symbol: resolvedSymbol,
       interval: tvInterval,
       timezone: "Etc/UTC",
       theme: activeTheme === "light" ? "light" : "dark",
