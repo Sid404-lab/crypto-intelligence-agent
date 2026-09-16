@@ -22,7 +22,7 @@ import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 from concurrent.futures import ThreadPoolExecutor
 
 
@@ -42,6 +42,7 @@ sys.path.insert(0, str(AGENT_DIR))
 # AGENT IMPORTS
 # ============================================================
 
+from fetch_candles import fetch_candles
 from fetch_listings import fetch_listings, fetch_trending_coins
 from fetch_market import fetch_markets
 from fetch_news import fetch_news
@@ -139,6 +140,9 @@ class APIHandler(http.server.SimpleHTTPRequestHandler):
 
             elif path == "/api/report":
                 self.handle_live_report()
+
+            elif path == "/api/candles":
+                self.handle_candles(parsed_path)
 
             else:
                 self.send_json(
@@ -333,6 +337,69 @@ class APIHandler(http.server.SimpleHTTPRequestHandler):
         self.send_json(
             report,
             status=200
+        )
+
+    # --------------------------------------------------------
+    # CANDLES
+    # --------------------------------------------------------
+
+    def handle_candles(self, parsed_path):
+        """Proxy Delta Exchange India OHLC candles for the lightweight chart."""
+        qs = parse_qs(parsed_path.query or "")
+        # Support both ?symbol=BTCUSD and ?symbol=BTC+?symbol=BTCUSD variants
+        raw_symbol = (qs.get("symbol") or qs.get("s") or [""])[0]
+        raw_res = (qs.get("resolution") or qs.get("res") or qs.get("timeframe") or ["1h"])[0]
+        symbol = str(raw_symbol or "").strip().upper()
+        # Allow short asset like BTC -> BTCUSD
+        if symbol and not symbol.endswith("USD") and not symbol.endswith("INR"):
+            # If it's one of the majors or any asset without suffix, append USD
+            symbol = f"{symbol}USD"
+        resolution = str(raw_res or "1h").strip().lower()
+        # Normalise 60 -> 1h, 30 -> 30m etc if frontend sends minutes
+        if resolution in ("60", "60m"):
+            resolution = "1h"
+        elif resolution in ("1", "1m"):
+            resolution = "1m"
+        elif resolution in ("30", "30m"):
+            resolution = "30m"
+        allowed = {"1m", "5m", "15m", "30m", "1h", "4h"}
+        if resolution not in allowed:
+            self.send_json(
+                {"error": f"Invalid resolution: {resolution}", "allowed": sorted(allowed)},
+                status=400,
+            )
+            return
+        if not symbol:
+            self.send_json({"error": "Missing ?symbol= parameter (e.g. ?symbol=BTCUSD&resolution=1h)"}, status=400)
+            return
+
+        print(f"[CANDLES] {symbol} {resolution}")
+
+        candles, err = fetch_candles(symbol, resolution, count=200)
+        if err:
+            print(f"[CANDLES] error {symbol} {resolution}: {err}", file=sys.stderr)
+            # Return empty with error field but 200 so chart can show message, or 502
+            self.send_json(
+                {
+                    "symbol": symbol,
+                    "resolution": resolution,
+                    "candles": [],
+                    "error": err,
+                    "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                },
+                status=502,
+            )
+            return
+
+        # Ensure shape for lightweight-charts: time is integer seconds
+        self.send_json(
+            {
+                "symbol": symbol,
+                "resolution": resolution,
+                "candles": candles,
+                "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            },
+            status=200,
         )
 
     # --------------------------------------------------------

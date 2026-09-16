@@ -855,9 +855,13 @@ body {
   background: var(--bg);
 }
 
-.tradingview-widget {
+.tradingview-widget,
+.lightweight-chart {
   width: 100%;
   height: 400px;
+}
+.lightweight-chart {
+  display: block;
 }
 
 .candle-countdown {
@@ -1342,7 +1346,8 @@ input[type="search"]:focus {
 
 .main-grid.drawer-collapsed .chart-panel,
 .main-grid.drawer-collapsed .chart-container,
-.main-grid.drawer-collapsed .tradingview-widget {
+.main-grid.drawer-collapsed .tradingview-widget,
+.main-grid.drawer-collapsed .lightweight-chart {
   width: 100%;
 }
 
@@ -2164,7 +2169,8 @@ input[type="search"]:focus {
     min-height: 300px;
   }
 
-  .tradingview-widget {
+  .tradingview-widget,
+  .lightweight-chart {
     height: 300px;
   }
 

@@ -32,7 +32,9 @@ const els = {
   status: document.getElementById("status"),
   scannerBody: document.getElementById("scanner-body"),
   refreshBtn: document.getElementById("refresh-btn"),
-  chartContainer: document.getElementById("tradingview-widget"),
+  chartContainer: document.getElementById("lightweight-chart"),
+  tvChartContainer: document.getElementById("tradingview-widget"),
+  lwChartContainer: document.getElementById("lightweight-chart"),
   chartControls: document.getElementById("chart-controls"),
   candleCountdown: document.getElementById("candle-countdown"),
   errorBanner: document.getElementById("error-banner"),
@@ -103,6 +105,17 @@ let countdownTimer = null;
 let isLoading = false;
 let reportTimer = null;
 let activeView = "dashboard";
+
+function warnMissing(id) {
+  console.warn(`Missing element: ${id} — AI Analysis section may not be in DOM yet`);
+}
+function safeSet(el, prop, value, id) {
+  if (!el) {
+    warnMissing(id);
+    return;
+  }
+  el[prop] = value;
+}
 
 // Markets dropdown state
 const METAL_SYMBOLS = ["XAU", "XAG", "PLAT"];
@@ -360,6 +373,13 @@ function handleDeltaTick(msg) {
   if (firstTick) {
     console.log(`[delta] first ${asset} tick: ${formatUsd(price)} (Delta India)`);
   }
+  // Update lightweight chart live candle if this tick is for the active chart symbol
+  try {
+    const chartAsset = chartSymbolToAsset(currentChartSymbol);
+    if (chartAsset && chartAsset === asset) {
+      updateLiveCandleFromTick(price);
+    }
+  } catch (e) {}
   renderPositions();
   renderRiskPage();
   renderAiRisk();
@@ -807,6 +827,13 @@ function applyTheme(theme) {
     );
   }
   if (els.settingsThemeLabel) els.settingsThemeLabel.textContent = activeTheme === "light" ? "Light" : "Dark";
+  try { applyChartTheme(); } catch (e) {}
+  // If currently showing TradingView, re-init with new theme
+  try {
+    if (!isCryptoEngineSymbol(currentChartSymbol)) {
+      initTradingView(currentChartSymbol);
+    }
+  } catch (e) {}
 }
 
 function syncSettingsDisplay() {
@@ -898,19 +925,273 @@ function renderScanner(trendingCoins) {
     .join("");
 }
 
+// ---- Lightweight-Charts (Delta India candles) ----
+let lwChart = null;
+let candleSeries = null;
+let currentCandles = [];
+let candlePollTimer = null;
+let chartResizeObserver = null;
+
+function getDeltaResolution(tfMinutes) {
+  const m = parseInt(tfMinutes, 10);
+  if (m === 1) return "1m";
+  if (m === 30) return "30m";
+  if (m === 60) return "1h";
+  return "1h";
+}
+
+function chartSymbolToAsset(sym) {
+  if (!sym) return null;
+  const s = String(sym).toUpperCase().trim();
+  if (s.endsWith("USD")) return s.slice(0, -3);
+  if (s.endsWith("INR")) return s.slice(0, -3);
+  return s;
+}
+
+function getChartColors() {
+  const s = getComputedStyle(document.documentElement);
+  const get = (name, fallback) => (s.getPropertyValue(name).trim() || fallback);
+  return {
+    bg: get("--bg", "#14120f"),
+    bgElev: get("--bg-elev", "#1c1a15"),
+    line: get("--line", "#322f27"),
+    text: get("--muted", "#9a9486"),
+    brass: get("--brass", "#c9a227"),
+    up: get("--up", "#7fae8a"),
+    down: get("--down", "#c56a56"),
+  };
+}
+
+function handleChartResize() {
+  if (!lwChart || !els.chartContainer) return;
+  const rect = els.chartContainer.getBoundingClientRect();
+  const w = Math.max(200, Math.floor(rect.width));
+  const h = 400;
+  try { lwChart.applyOptions({ width: w, height: h }); } catch (e) {}
+  try { lwChart.timeScale().fitContent(); } catch (e) {}
+}
+
+function applyChartTheme() {
+  if (!lwChart) return;
+  const c = getChartColors();
+  try {
+    lwChart.applyOptions({
+      layout: { background: { type: "solid", color: c.bg }, textColor: c.text },
+      grid: { vertLines: { color: c.line }, horzLines: { color: c.line } },
+      rightPriceScale: { borderColor: c.line },
+      timeScale: { borderColor: c.line },
+    });
+  } catch (e) {}
+  if (candleSeries) {
+    try {
+      candleSeries.applyOptions({
+        upColor: c.up,
+        downColor: c.down,
+        borderUpColor: c.up,
+        borderDownColor: c.down,
+        wickUpColor: c.up,
+        wickDownColor: c.down,
+      });
+    } catch (e) {}
+  }
+}
+
+function ensureLightweightChart() {
+  const container = els.chartContainer || document.getElementById("lightweight-chart");
+  if (!container) return null;
+  if (lwChart && candleSeries) return lwChart;
+  const c = getChartColors();
+  const w = Math.max(200, Math.floor(container.clientWidth || container.getBoundingClientRect().width || 600));
+  const LW = window.LightweightCharts;
+  if (!LW || typeof LW.createChart !== "function") {
+    console.warn("[chart] lightweight-charts not loaded yet");
+    container.innerHTML = '<p class="empty" style="padding:40px;text-align:center;">Chart library loading...</p>';
+    return null;
+  }
+  container.innerHTML = "";
+  try { container.style.position = "relative"; } catch (e) {}
+  lwChart = LW.createChart(container, {
+    width: w,
+    height: 400,
+    layout: { background: { type: "solid", color: c.bg }, textColor: c.text },
+    grid: { vertLines: { color: c.line }, horzLines: { color: c.line } },
+    crosshair: { mode: 0 },
+    rightPriceScale: { borderColor: c.line, scaleMargins: { top: 0.08, bottom: 0.08 } },
+    timeScale: { borderColor: c.line, timeVisible: true, secondsVisible: false, rightOffset: 4, barSpacing: 6 },
+    handleScroll: { mouseWheel: true, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false },
+    handleScale: { axisPressedMouseMove: true, mouseWheel: true, pinch: true },
+  });
+  candleSeries = lwChart.addCandlestickSeries({
+    upColor: c.up,
+    downColor: c.down,
+    borderVisible: false,
+    borderUpColor: c.up,
+    borderDownColor: c.down,
+    wickUpColor: c.up,
+    wickDownColor: c.down,
+  });
+  if (window.ResizeObserver && !chartResizeObserver) {
+    chartResizeObserver = new ResizeObserver(() => handleChartResize());
+    chartResizeObserver.observe(container);
+  }
+  window.addEventListener("resize", handleChartResize);
+  try {
+    const mo = new MutationObserver(() => applyChartTheme());
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  } catch (e) {}
+  return lwChart;
+}
+
+function showChartMessage(msg) {
+  if (!candleSeries) return;
+  const container = els.chartContainer;
+  if (!container) return;
+  let overlay = container.querySelector(".chart-empty-overlay");
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.className = "chart-empty-overlay";
+    overlay.style.cssText = "position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--muted);font-family:var(--mono);font-size:12px;z-index:2;text-align:center;padding:20px;";
+    container.style.position = "relative";
+    container.appendChild(overlay);
+  }
+  overlay.textContent = msg;
+  overlay.style.display = "flex";
+}
+function hideChartMessage() {
+  const container = els.chartContainer;
+  if (!container) return;
+  const overlay = container.querySelector(".chart-empty-overlay");
+  if (overlay) overlay.style.display = "none";
+}
+
+async function fetchCandlesDelta(symbolContract, resolution) {
+  const normSymbol = String(symbolContract || "").toUpperCase().trim();
+  const normRes = String(resolution || "1h").toLowerCase().trim();
+  const params = new URLSearchParams({ symbol: normSymbol, resolution: normRes });
+  try {
+    const resp = await fetch("/api/candles?" + params.toString(), { cache: "no-store" });
+    if (resp.ok) {
+      const data = await resp.json();
+      if (data && Array.isArray(data.candles) && data.candles.length) {
+        return data.candles.map((c) => ({ time: c.time, open: c.open, high: c.high, low: c.low, close: c.close }));
+      }
+      if (data && data.error) throw new Error(data.error);
+    }
+    if (resp && resp.status !== 404) {
+      const maybe = await resp.json().catch(() => null);
+      if (maybe && maybe.error) throw new Error(maybe.error);
+    }
+  } catch (e) {
+    const msg = String(e && e.message || "");
+    const isNotFound = msg.includes("404") || msg.toLowerCase().includes("not found");
+    if (!isNotFound && !msg.includes("Failed to fetch") && !msg.includes("NetworkError")) {
+      // keep going to direct fallback
+    }
+  }
+  const secMap = { "1m": 60, "30m": 1800, "1h": 3600 };
+  const sec = secMap[normRes] || 3600;
+  const count = 200;
+  const end = Math.floor(Date.now() / 1000);
+  const start = end - sec * count * 2;
+  const deltaParams = new URLSearchParams({ resolution: normRes, symbol: normSymbol, start: String(start), end: String(end) });
+  const url = "https://api.india.delta.exchange/v2/history/candles?" + deltaParams.toString();
+  const r = await fetch(url, { cache: "no-store" });
+  if (!r.ok) throw new Error("Delta candles " + r.status);
+  const j = await r.json();
+  const arr = j.result || [];
+  const candles = [];
+  for (const c of arr) {
+    const o = parseFloat(c.open), h = parseFloat(c.high), l = parseFloat(c.low), cl = parseFloat(c.close);
+    const t = parseInt(c.time, 10);
+    if (!isFinite(o) || !isFinite(h) || !isFinite(l) || !isFinite(cl) || !t) continue;
+    candles.push({ time: t, open: o, high: h, low: l, close: cl });
+  }
+  candles.sort((a, b) => a.time - b.time);
+  return candles.slice(-count);
+}
+
+async function refreshChartData() {
+  const container = els.chartContainer || document.getElementById("lightweight-chart");
+  if (!container) return;
+  const symbol = currentChartSymbol || "BTCUSD";
+  const res = getDeltaResolution(currentTimeframe);
+  ensureLightweightChart();
+  if (!candleSeries) return;
+  try {
+    const data = await fetchCandlesDelta(symbol, res);
+    if (!data || !data.length) {
+      showChartMessage("No candle data for " + symbol + " " + res + " — Delta may not list this market.");
+      return;
+    }
+    hideChartMessage();
+    currentCandles = data;
+    candleSeries.setData(data);
+    try { lwChart.timeScale().fitContent(); } catch (e) {}
+  } catch (e) {
+    console.warn("[chart] fetch failed", e);
+    showChartMessage(String(e.message || e).slice(0, 160));
+  }
+}
+
+function startCandlePolling() {
+  if (candlePollTimer) clearInterval(candlePollTimer);
+  const interval = currentTimeframe === 1 ? 10000 : 15000;
+  candlePollTimer = setInterval(() => { refreshChartData().catch(()=>{}); }, interval);
+}
+
+function updateLiveCandleFromTick(price) {
+  if (!candleSeries || !currentCandles.length) return;
+  const last = currentCandles[currentCandles.length - 1];
+  if (!last) return;
+  const p = Number(price);
+  if (!isFinite(p)) return;
+  const updated = {
+    time: last.time,
+    open: last.open,
+    high: Math.max(last.high, p),
+    low: Math.min(last.low, p),
+    close: p,
+  };
+  last.high = updated.high;
+  last.low = updated.low;
+  last.close = p;
+  try { candleSeries.update(updated); } catch (e) {}
+}
+
+function initLightweightChart(symbol) {
+  if (symbol) currentChartSymbol = symbol;
+  ensureLightweightChart();
+  refreshChartData();
+  startCandlePolling();
+  handleChartResize();
+}
+
+function isCryptoEngineSymbol(symbol) {
+  if (!symbol) return false;
+  const s = String(symbol).trim();
+  if (s.includes(":")) return false;
+  const asset = chartSymbolToAsset(s);
+  return ["BTC","ETH","SOL","BNB","XRP","DOGE"].includes(asset);
+}
+
 function initTradingView(symbol = "BTCUSD") {
-  if (els.chartContainer && typeof TradingView !== "undefined") {
-    els.chartContainer.innerHTML = "";
+  const tvContainer = els.tvChartContainer || document.getElementById("tradingview-widget");
+  if (!tvContainer || typeof TradingView === "undefined") {
+    console.warn("[tv] TradingView not loaded or container missing");
+    return;
+  }
+  tvContainer.innerHTML = "";
+  try {
     new TradingView.widget({
       width: "100%",
       height: 400,
       symbol: symbol,
       interval: String(currentTimeframe),
       timezone: "Etc/UTC",
-      theme: "dark",
+      theme: activeTheme === "light" ? "light" : "dark",
       style: "1",
       locale: "en",
-      toolbar_bg: "#1c1a15",
+      toolbar_bg: activeTheme === "light" ? "#fffdf6" : "#1c1a15",
       enable_publishing: false,
       allow_symbol_change: true,
       container_id: "tradingview-widget",
@@ -919,15 +1200,46 @@ function initTradingView(symbol = "BTCUSD") {
         "mainSeriesProperties.showCountdown": true
       }
     });
+  } catch (e) {
+    console.warn("[tv] widget failed", e);
   }
 }
+
+function showChartEngine(symbol) {
+  const sym = symbol || currentChartSymbol;
+  const isCrypto = isCryptoEngineSymbol(sym);
+  const lwEl = els.chartContainer || els.lwChartContainer || document.getElementById("lightweight-chart");
+  const tvEl = els.tvChartContainer || document.getElementById("tradingview-widget");
+  const cdEl = els.candleCountdown || document.getElementById("candle-countdown");
+  currentChartSymbol = sym;
+  document.querySelectorAll(".chart-btn").forEach((btn) => {
+    btn.classList.toggle("is-active", btn.dataset.symbol === sym);
+  });
+  if (isCrypto) {
+    if (lwEl) lwEl.hidden = false;
+    if (tvEl) tvEl.hidden = true;
+    if (cdEl) cdEl.hidden = false;
+    ensureLightweightChart();
+    refreshChartData();
+    startCandlePolling();
+    handleChartResize();
+    startCountdown();
+  } else {
+    if (lwEl) lwEl.hidden = true;
+    if (tvEl) tvEl.hidden = false;
+    if (cdEl) cdEl.hidden = true;
+    if (candlePollTimer) { clearInterval(candlePollTimer); candlePollTimer = null; }
+    initTradingView(sym);
+  }
+}
+
 
 // ---- Candle countdown (Approach 2 overlay fallback) ----
 function getCandleRemainingSec() {
   const now = new Date();
   const tf = currentTimeframe;
   const intervalMs = tf * 60 * 1000;
-  // Use UTC to align with TradingView's Etc/UTC interval
+  // Use UTC to align with Delta candle intervals's Etc/UTC interval
   const msIntoInterval = (now.getUTCMinutes() % tf) * 60000 + now.getUTCSeconds() * 1000 + now.getUTCMilliseconds();
   const msRemaining = intervalMs - msIntoInterval;
   let totalSec = Math.ceil(msRemaining / 1000);
@@ -962,8 +1274,13 @@ function setTimeframe(tf) {
   document.querySelectorAll(".chart-tf-btn").forEach((btn) => {
     btn.classList.toggle("is-active", parseInt(btn.dataset.tf, 10) === parsed);
   });
-  initTradingView(currentChartSymbol);
-  startCountdown();
+  if (isCryptoEngineSymbol(currentChartSymbol)) {
+    showChartEngine(currentChartSymbol);
+    startCountdown();
+    startCandlePolling();
+  } else {
+    initTradingView(currentChartSymbol);
+  }
 }
 
 function setLoading(loading) {
@@ -1003,6 +1320,10 @@ function renderNews() {
 }
 
 function renderListings() {
+  if (!els.listings) {
+    console.log("renderListings: #listings-body missing (New Prints removed)");
+    return;
+  }
   const query = els.search.value.trim().toLowerCase();
   const rows = report.listings.filter((item) =>
     matchesQuery(`${item.name} ${item.symbol} ${item.note}`, query)
@@ -1038,11 +1359,20 @@ function getChartSymbol(market) {
 
 function switchChart(symbol) {
   if (!symbol || symbol === currentChartSymbol) return;
-  currentChartSymbol = symbol;
-  document.querySelectorAll(".chart-btn").forEach((btn) => {
-    btn.classList.toggle("is-active", btn.dataset.symbol === symbol);
-  });
-  initTradingView(symbol);
+  showChartEngine(symbol);
+}
+
+function getDeltaChartSymbol(market) {
+  // Prefer Delta contract if available (BTCUSD), otherwise fall back to tv style then to SYMBOLUSD
+  if (!market) return null;
+  if (market.india && market.india.contract) return market.india.contract;
+  if (market.contract) return market.contract;
+  // Try getChartSymbol fallback
+  try {
+    const tv = getChartSymbol(market);
+    if (tv && tv.includes("USD")) return tv;
+  } catch (e) {}
+  return `${market.symbol}USD`;
 }
 
 function renderChartControls(markets, metals = []) {
@@ -1053,11 +1383,11 @@ function renderChartControls(markets, metals = []) {
 
   els.chartControls.innerHTML = allMarkets
     .map((market) => {
-      const symbol = getChartSymbol(market);
+      const symbol = getDeltaChartSymbol(market);
       const isCrypto = deltaMajors.has(market.symbol);
       const deltaUrl = isCrypto ? getDeltaTradeUrl(market.symbol) : null;
       const deltaLink = deltaUrl
-        ? `<a href="${deltaUrl}" target="_blank" rel="noopener" class="chart-delta-link" title="Trade ${market.symbol} on Delta India" aria-label="Trade ${market.symbol} on Delta India" onclick="event.stopPropagation()">Trade ↗</a>`
+        ? `<a href="${deltaUrl}" target="_blank" rel="noopener" class="chart-delta-link" title="Trade ${market.symbol} on Delta India" aria-label="Trade ${market.symbol} on Delta India" onclick="event.stopPropagation()">Trade \u2197</a>`
         : "";
       if (deltaUrl) {
         return `<div class="chart-btn-group">
@@ -1130,18 +1460,18 @@ function renderErrorBanner(errors) {
 
 function renderAiBriefing(aiBriefing) {
   if (!aiBriefing) {
-    if (els.aiMorningSummary) els.aiMorningSummary.textContent = "AI briefing not available";
-    if (els.aiWatchList) els.aiWatchList.innerHTML = "<li>No AI watch items available</li>";
+    if (els.aiMorningSummary) els.aiMorningSummary.textContent = "AI briefing not available"; else warnMissing("ai-morning-summary");
+    if (els.aiWatchList) els.aiWatchList.innerHTML = "<li>No AI watch items available</li>"; else warnMissing("ai-watch-list");
     if (els.marketSentiment) {
       els.marketSentiment.textContent = "Unknown";
       els.marketSentiment.className = "sentiment-badge sentiment-unknown";
-    }
-    if (els.aiFullMorningSummary) els.aiFullMorningSummary.textContent = "AI briefing not available";
-    if (els.aiFullWatchList) els.aiFullWatchList.innerHTML = "<li>No AI watch items available</li>";
+    } else warnMissing("market-sentiment");
+    if (els.aiFullMorningSummary) els.aiFullMorningSummary.textContent = "AI briefing not available"; else warnMissing("ai-full-morning-summary");
+    if (els.aiFullWatchList) els.aiFullWatchList.innerHTML = "<li>No AI watch items available</li>"; else warnMissing("ai-full-watch-list");
     if (els.aiFullMarketSentiment) {
       els.aiFullMarketSentiment.textContent = "Unknown";
       els.aiFullMarketSentiment.className = "sentiment-badge sentiment-unknown";
-    }
+    } else warnMissing("ai-full-market-sentiment");
     return;
   }
 
@@ -1154,23 +1484,26 @@ function renderAiBriefing(aiBriefing) {
     ? "<li>No watch items available</li>"
     : watchItems.map((item) => `<li>${item}</li>`).join("");
 
-  if (els.aiMorningSummary) els.aiMorningSummary.textContent = summary;
+  if (els.aiMorningSummary) els.aiMorningSummary.textContent = summary; else warnMissing("ai-morning-summary");
   if (els.marketSentiment) {
     els.marketSentiment.textContent = sentimentLabel;
     els.marketSentiment.className = sentimentClass;
-  }
-  if (els.aiWatchList) els.aiWatchList.innerHTML = watchHtml;
+  } else warnMissing("market-sentiment");
+  if (els.aiWatchList) els.aiWatchList.innerHTML = watchHtml; else warnMissing("ai-watch-list");
 
-  if (els.aiFullMorningSummary) els.aiFullMorningSummary.textContent = summary;
+  if (els.aiFullMorningSummary) els.aiFullMorningSummary.textContent = summary; else warnMissing("ai-full-morning-summary");
   if (els.aiFullMarketSentiment) {
     els.aiFullMarketSentiment.textContent = sentimentLabel;
     els.aiFullMarketSentiment.className = sentimentClass;
-  }
-  if (els.aiFullWatchList) els.aiFullWatchList.innerHTML = watchHtml;
+  } else warnMissing("ai-full-market-sentiment");
+  if (els.aiFullWatchList) els.aiFullWatchList.innerHTML = watchHtml; else warnMissing("ai-full-watch-list");
 }
 
 function renderTopSetup(topSetup, targetEl = els.topSetupContent) {
-  if (!targetEl) return;
+  if (!targetEl) {
+    warnMissing("top-setup-content / ai-setup-content / ai-full-setup-content (renderTopSetup target missing)");
+    return;
+  }
   
   if (!topSetup || topSetup.note) {
     targetEl.innerHTML = `
@@ -1350,8 +1683,8 @@ function renderRiskPage() {
 
 function renderAiSetupTab() {
   if (!report) return;
-  if (els.aiSetupContent) renderTopSetup(report.top_setup, els.aiSetupContent);
-  if (els.aiFullSetupContent) renderTopSetup(report.top_setup, els.aiFullSetupContent);
+  if (els.aiSetupContent) renderTopSetup(report.top_setup, els.aiSetupContent); else warnMissing("ai-setup-content");
+  if (els.aiFullSetupContent) renderTopSetup(report.top_setup, els.aiFullSetupContent); else warnMissing("ai-full-setup-content");
 }
 
 function renderAiRisk() {
@@ -1366,8 +1699,8 @@ function renderAiRisk() {
     <ul class="ai-watch-list">
       ${summary.assets.slice(0, 3).map((a) => `<li>${a.symbol} — ${formatUsd(a.exposure)} (${a.pctEquity.toFixed(1)}% of equity)</li>`).join("")}
     </ul>`;
-  if (els.aiRiskContent) els.aiRiskContent.innerHTML = riskHtml;
-  if (els.aiFullRiskContent) els.aiFullRiskContent.innerHTML = riskHtml;
+  if (els.aiRiskContent) els.aiRiskContent.innerHTML = riskHtml; else warnMissing("ai-risk-content");
+  if (els.aiFullRiskContent) els.aiFullRiskContent.innerHTML = riskHtml; else warnMissing("ai-full-risk-content");
 }
 
 function renderReport() {
@@ -1393,7 +1726,7 @@ function renderReport() {
   // After report loads, ensure Delta WS is subscribed to all 186 crypto symbols for live Snapshot
   try { subscribeDeltaAll(); } catch {}
   
-  initTradingView(currentChartSymbol);
+  showChartEngine(currentChartSymbol);
 }
 
 function showError(message) {
@@ -1965,8 +2298,8 @@ if (snapshotToggle && snapshotPanel) {
     snapshotToggle.setAttribute("aria-expanded", String(!isCollapsed));
     if (rightPanelEl) rightPanelEl.classList.toggle("is-collapsed", isCollapsed);
     if (mainGridEl) mainGridEl.classList.toggle("drawer-collapsed", isCollapsed);
-    // Trigger TradingView resize after drawer animation
-    setTimeout(() => window.dispatchEvent(new Event('resize')), 300);
+    // Trigger chart resize after drawer animation
+    setTimeout(() => { window.dispatchEvent(new Event('resize')); try { handleChartResize(); } catch(e){} }, 300);
   });
 }
 
@@ -2099,6 +2432,20 @@ if (els.mobileOverlay) {
 
 if (els.sidebarToggle) {
   els.sidebarToggle.addEventListener("click", toggleSidebar);
+}
+
+const sidebarBrand = document.getElementById("sidebar-brand");
+if (sidebarBrand) {
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+  sidebarBrand.addEventListener("click", scrollToTop);
+  sidebarBrand.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      scrollToTop();
+    }
+  });
+} else {
+  console.warn("Missing element: sidebar-brand");
 }
 
 if (els.comingSoonClose) {

@@ -24,7 +24,7 @@
   </head>
   <body>
     <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
-      <div class="sidebar-brand">
+      <div class="sidebar-brand" id="sidebar-brand" role="button" tabindex="0" aria-label="Scroll to top" title="Scroll to top" style="cursor:pointer">
         <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
         </svg>
@@ -234,7 +234,8 @@
               </div>
             </div>
             <div class="chart-container">
-              <div id="tradingview-widget" class="tradingview-widget"></div>
+              <div id="lightweight-chart" class="lightweight-chart"></div>
+              <div id="tradingview-widget" class="tradingview-widget" hidden></div>
               <div id="candle-countdown" class="candle-countdown" aria-live="polite" title="Time to candle close">Closes in: --:--</div>
             </div>
           </section>
@@ -543,7 +544,8 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 15l-6-6-6 6"/></svg>
     </button>
 
-    <script src="./app.js?v=wiring-2"></script>
+    <script src="https://unpkg.com/lightweight-charts@4.2.1/dist/lightweight-charts.standalone.production.js"></script>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script src="./app.js?v=lw-1"></script>
   </body>
 </html>
