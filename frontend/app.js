@@ -931,6 +931,7 @@ let candleSeries = null;
 let currentCandles = [];
 let candlePollTimer = null;
 let chartResizeObserver = null;
+let tvWidget = null;
 
 function getDeltaResolution(tfMinutes) {
   const m = parseInt(tfMinutes, 10);
@@ -1040,6 +1041,41 @@ function ensureLightweightChart() {
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
   } catch (e) {}
   return lwChart;
+}
+
+function destroyLightweightChart() {
+  if (candlePollTimer) { clearInterval(candlePollTimer); candlePollTimer = null; }
+  if (chartResizeObserver) {
+    try { chartResizeObserver.disconnect(); } catch (e) {}
+    chartResizeObserver = null;
+  }
+  window.removeEventListener("resize", handleChartResize);
+  if (lwChart) {
+    try { lwChart.remove(); } catch (e) {}
+    lwChart = null;
+    candleSeries = null;
+    currentCandles = [];
+  }
+  const lwEl = els.chartContainer || document.getElementById("lightweight-chart");
+  if (lwEl) {
+    lwEl.innerHTML = "";
+    // Ensure any overlay removed
+    const ov = lwEl.querySelector(".chart-empty-overlay");
+    if (ov) ov.remove();
+  }
+  // Also remove the MutationObserver for theme? It's inside ensure, but we can leave.
+}
+
+function destroyTradingView() {
+  if (tvWidget) {
+    try {
+      if (typeof tvWidget.remove === "function") tvWidget.remove();
+      else if (typeof tvWidget.unsubscribe === "function") tvWidget.unsubscribe();
+    } catch (e) {}
+    tvWidget = null;
+  }
+  const tvEl = els.tvChartContainer || document.getElementById("tradingview-widget");
+  if (tvEl) tvEl.innerHTML = "";
 }
 
 function showChartMessage(msg) {
@@ -1180,9 +1216,12 @@ function initTradingView(symbol = "BTCUSD") {
     console.warn("[tv] TradingView not loaded or container missing");
     return;
   }
-  tvContainer.innerHTML = "";
+  // Tear down previous instance before creating new one
+  destroyTradingView();
+  tvContainer.hidden = false;
+  tvContainer.style.display = "";
   try {
-    new TradingView.widget({
+    tvWidget = new TradingView.widget({
       width: "100%",
       height: 400,
       symbol: symbol,
@@ -1216,8 +1255,10 @@ function showChartEngine(symbol) {
     btn.classList.toggle("is-active", btn.dataset.symbol === sym);
   });
   if (isCrypto) {
-    if (lwEl) lwEl.hidden = false;
-    if (tvEl) tvEl.hidden = true;
+    // Crypto → lightweight only: fully tear down TradingView
+    destroyTradingView();
+    if (tvEl) { tvEl.hidden = true; tvEl.style.display = "none"; }
+    if (lwEl) { lwEl.hidden = false; lwEl.style.display = ""; }
     if (cdEl) cdEl.hidden = false;
     ensureLightweightChart();
     refreshChartData();
@@ -1225,10 +1266,11 @@ function showChartEngine(symbol) {
     handleChartResize();
     startCountdown();
   } else {
-    if (lwEl) lwEl.hidden = true;
-    if (tvEl) tvEl.hidden = false;
+    // Non-crypto → TradingView only: fully tear down lightweight
+    destroyLightweightChart();
+    if (lwEl) { lwEl.hidden = true; lwEl.style.display = "none"; }
+    if (tvEl) { tvEl.hidden = false; tvEl.style.display = ""; }
     if (cdEl) cdEl.hidden = true;
-    if (candlePollTimer) { clearInterval(candlePollTimer); candlePollTimer = null; }
     initTradingView(sym);
   }
 }
@@ -1363,16 +1405,15 @@ function switchChart(symbol) {
 }
 
 function getDeltaChartSymbol(market) {
-  // Prefer Delta contract if available (BTCUSD), otherwise fall back to tv style then to SYMBOLUSD
+  // For the 6 crypto majors, return Delta contract (BTCUSD etc) for lightweight-charts.
+  // For everything else (XAU, XAG, etc.) return the TradingView symbol directly.
   if (!market) return null;
-  if (market.india && market.india.contract) return market.india.contract;
-  if (market.contract) return market.contract;
-  // Try getChartSymbol fallback
-  try {
-    const tv = getChartSymbol(market);
-    if (tv && tv.includes("USD")) return tv;
-  } catch (e) {}
-  return `${market.symbol}USD`;
+  if (["BTC","ETH","SOL","BNB","XRP","DOGE"].includes(market.symbol)) {
+    if (market.india && market.india.contract) return market.india.contract;
+    if (market.contract) return market.contract;
+    return `${market.symbol}USD`;
+  }
+  return getChartSymbol(market);
 }
 
 function renderChartControls(markets, metals = []) {

@@ -863,6 +863,10 @@ body {
 .lightweight-chart {
   display: block;
 }
+.lightweight-chart[hidden],
+.tradingview-widget[hidden] {
+  display: none !important;
+}
 
 .candle-countdown {
   position: absolute;
