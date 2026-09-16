@@ -77,12 +77,14 @@ const els = {
   mdMarketsFilters: document.querySelectorAll("#markets-dropdown [data-mfilter]"),
   mdStocksFilters: document.querySelectorAll("#markets-dropdown [data-sfilter]"),
   mdSearch: document.getElementById("md-search"),
+  mdStocksSearch: document.getElementById("md-stocks-search"),
   mdList: document.getElementById("md-list"),
   mdCount: document.getElementById("md-count"),
   snapTabs: document.querySelectorAll(".snap-tab"),
   snapFilters: document.querySelectorAll("[data-snapfilter]"),
   snapMarketsFilters: document.querySelectorAll("[data-snapfilter-markets]"),
   snapStocksFilters: document.querySelectorAll("[data-snapfilter-stocks]"),
+  snapStocksSearch: document.getElementById("snap-stocks-search"),
   snapSearch: document.getElementById("snap-search"),
   snapList: document.getElementById("snap-list"),
   snapCount: document.getElementById("snap-count"),
@@ -131,6 +133,7 @@ let mdCryptoFilter = "all";
 let mdMarketsSub = "metals";
 let mdStocksSub = "nse";
 let mdQuery = "";
+let mdStocksQuery = "";
 let mdLastRows = [];
 
 // Inline snapshot panel state (mirrors the dropdown above)
@@ -138,6 +141,7 @@ let snapCat = "crypto";
 let snapFilter = "all";
 let snapMarketsSub = "metals";
 let snapStocksSub = "nse";
+let snapStocksQuery = "";
 let snapQuery = "";
 let snapLastRows = [];
 
@@ -174,14 +178,14 @@ const WATCHLIST = [
 ];
 
 const STOCKS_NSE_BSE = [
-  { symbol: "RELIANCE", name: "Reliance Industries", tv: "NSE:RELIANCE" },
-  { symbol: "TCS", name: "Tata Consultancy Services", tv: "NSE:TCS" },
-  { symbol: "INFY", name: "Infosys", tv: "NSE:INFY" },
-  { symbol: "HDFCBANK", name: "HDFC Bank", tv: "NSE:HDFCBANK" },
-  { symbol: "ICICIBANK", name: "ICICI Bank", tv: "NSE:ICICIBANK" },
-  { symbol: "SBIN", name: "State Bank of India", tv: "NSE:SBIN" },
-  { symbol: "BHARTIARTL", name: "Bharti Airtel", tv: "NSE:BHARTIARTL" },
-  { symbol: "ITC", name: "ITC", tv: "NSE:ITC" },
+  { symbol: "RELIANCE", name: "Reliance Industries", tv: "BSE:RELIANCE" },
+  { symbol: "TCS", name: "Tata Consultancy Services", tv: "BSE:TCS" },
+  { symbol: "INFY", name: "Infosys", tv: "BSE:INFY" },
+  { symbol: "HDFCBANK", name: "HDFC Bank", tv: "BSE:HDFCBANK" },
+  { symbol: "ICICIBANK", name: "ICICI Bank", tv: "BSE:ICICIBANK" },
+  { symbol: "SBIN", name: "State Bank of India", tv: "BSE:SBIN" },
+  { symbol: "BHARTIARTL", name: "Bharti Airtel", tv: "BSE:BHARTIARTL" },
+  { symbol: "ITC", name: "ITC", tv: "BSE:ITC" },
 ];
 
 const STOCKS_US = [
@@ -194,6 +198,72 @@ const STOCKS_US = [
   { symbol: "META", name: "Meta Platforms", tv: "NASDAQ:META" },
   { symbol: "NFLX", name: "Netflix", tv: "NASDAQ:NFLX" },
 ];
+
+// Helper: build stock rows for a given subfilter ("nse" or "us") and query, with free-text + optional TradingView search
+function stocksRowsFor(sub, query) {
+  const q = String(query || "").trim().toUpperCase();
+  const base = sub === "us" ? STOCKS_US : STOCKS_NSE_BSE;
+  let rows = base.map((s) => ({ symbol: s.symbol, name: s.name, price: null, change: null, tv: s.tv }));
+  if (q) {
+    const filtered = rows.filter((r) => r.symbol.toLowerCase().includes(q.toLowerCase()) || r.name.toLowerCase().includes(q.toLowerCase()));
+    // If query looks like full symbol with colon (e.g., BSE:RELIANCE or NASDAQ:AAPL), use as is
+    let custom = null;
+    if (q.includes(":")) {
+      const parts = q.split(":");
+      const exch = parts[0].trim().toUpperCase();
+      const sym = parts.slice(1).join(":").trim().toUpperCase();
+      if (sym) custom = { symbol: sym, name: sym, price: null, change: null, tv: `${exch}:${sym}` };
+    } else {
+      // Free-text: prepend correct exchange based on sub
+      const exch = sub === "us" ? "NASDAQ" : "BSE";
+      const upper = q.toUpperCase().replace(/[^A-Z0-9.-]/g, "");
+      if (upper && !filtered.some((r) => r.symbol === upper)) {
+        custom = { symbol: upper, name: upper, price: null, change: null, tv: `${exch}:${upper}` };
+      }
+    }
+    if (custom && !filtered.some((r) => r.tv === custom.tv)) {
+      rows = [custom, ...filtered];
+    } else {
+      rows = filtered.length ? filtered : (custom ? [custom] : []);
+    }
+    // If still empty and query valid, show custom
+    if (!rows.length && q) {
+      const exch = sub === "us" ? "NASDAQ" : "BSE";
+      rows = [{ symbol: q.toUpperCase(), name: q.toUpperCase(), price: null, change: null, tv: `${exch}:${q.toUpperCase()}` }];
+    }
+  }
+  return rows;
+}
+
+// Attempt TradingView symbol search autocomplete (if available), falls back to free-text
+let tvSearchCache = {};
+async function fetchTradingViewSymbols(query, exchange) {
+  const key = `${exchange}:${query}`;
+  if (tvSearchCache[key]) return tvSearchCache[key];
+  const q = String(query || "").trim();
+  if (!q || q.length < 1) return [];
+  try {
+    // TradingView public symbol search - may be blocked by CORS, so we catch and fallback
+    const url = `https://symbol-search.tradingview.com/symbol_search/?text=${encodeURIComponent(q)}&exchange=${encodeURIComponent(exchange)}&type=stock`;
+    const resp = await fetch(url, { headers: { Accept: "application/json" } });
+    if (!resp.ok) throw new Error(`search ${resp.status}`);
+    const data = await resp.json();
+    // data may be array or object with symbols
+    const arr = Array.isArray(data) ? data : (data.symbols || data.result || []);
+    const out = (arr || []).slice(0, 8).map((s) => ({
+      symbol: (s.symbol || s.ticker || "").toUpperCase(),
+      name: s.description || s.symbol || "",
+      tv: `${s.exchange || exchange}:${s.symbol || s.ticker}`,
+      price: null,
+      change: null,
+    })).filter((r) => r.symbol);
+    tvSearchCache[key] = out;
+    return out;
+  } catch (e) {
+    return null; // signal to use free-text fallback
+  }
+}
+
 
 function formatUsd(value) {
   return new Intl.NumberFormat("en-US", {
@@ -1250,12 +1320,17 @@ function initTradingView(symbol = "BTCUSD") {
   destroyTradingView();
   tvContainer.hidden = false;
   tvContainer.style.display = "";
+  // For BSE/NSE Indian stocks, only Daily interval is available on the free widget (intraday shows "Only D, W, M available" or "only available on TradingView")
+  let tvInterval = String(currentTimeframe);
+  if (symbol && (symbol.startsWith("BSE:") || symbol.startsWith("NSE:"))) {
+    tvInterval = "D";
+  }
   try {
     tvWidget = new TradingView.widget({
       width: "100%",
       height: 400,
       symbol: symbol,
-      interval: String(currentTimeframe),
+      interval: tvInterval,
       timezone: "Etc/UTC",
       theme: activeTheme === "light" ? "light" : "dark",
       style: "1",
@@ -1960,10 +2035,15 @@ function mdCategoryAssets(cat) {
   if (cat === "markets") cat = "metals";
   if (cat === "stocks") cat = "stocks_nse";
   if (cat === "stocks_nse") {
+    // Use query-aware helper if called from stocks tab (query stored in mdStocksQuery/snapStocksQuery handled by caller)
     return STOCKS_NSE_BSE.map((s) => ({ symbol: s.symbol, name: s.name, price: null, change: null, tv: s.tv }));
   }
   if (cat === "stocks_us") {
     return STOCKS_US.map((s) => ({ symbol: s.symbol, name: s.name, price: null, change: null, tv: s.tv }));
+  }
+  if (cat === "stocks") {
+    // Generic fallback - used when no sub specified
+    return STOCKS_NSE_BSE.map((s) => ({ symbol: s.symbol, name: s.name, price: null, change: null, tv: s.tv }));
   }
   if (!report) return [];
   if (cat === "crypto") {
@@ -2111,6 +2191,9 @@ function renderSnapBrowser() {
   if (els.snapSearch && document.activeElement !== els.snapSearch) {
     els.snapSearch.value = snapQuery;
   }
+  if (els.snapStocksSearch && document.activeElement !== els.snapStocksSearch) {
+    els.snapStocksSearch.value = snapStocksQuery;
+  }
   renderSnapList();
 }
 
@@ -2126,9 +2209,9 @@ function renderSnapList() {
     rows = mdCategoryAssets(snapMarketsSub);
     label = `${rows.length} asset${rows.length === 1 ? "" : "s"}`;
   } else if (snapCat === "stocks") {
-    const stockCat = snapStocksSub === "us" ? "stocks_us" : "stocks_nse";
-    rows = mdCategoryAssets(stockCat);
+    rows = stocksRowsFor(snapStocksSub, snapStocksQuery);
     label = `${rows.length} asset${rows.length === 1 ? "" : "s"}`;
+    // Keep snapLastRows tv mapping consistent: rows already have tv
   } else {
     rows = mdCategoryAssets(snapCat);
     label = `${rows.length} asset${rows.length === 1 ? "" : "s"}`;
@@ -2152,8 +2235,7 @@ function renderMdList() {
     rows = mdCategoryAssets(mdMarketsSub);
     label = `${rows.length} asset${rows.length === 1 ? "" : "s"}`;
   } else if (mdCat === "stocks") {
-    const stockCat = mdStocksSub === "us" ? "stocks_us" : "stocks_nse";
-    rows = mdCategoryAssets(stockCat);
+    rows = stocksRowsFor(mdStocksSub, mdStocksQuery);
     label = `${rows.length} asset${rows.length === 1 ? "" : "s"}`;
   } else {
     rows = mdCategoryAssets(mdCat);
@@ -2188,6 +2270,9 @@ function renderMarketsDropdown() {
   if (stocksTools) stocksTools.hidden = mdCat !== "stocks";
   if (els.mdSearch && document.activeElement !== els.mdSearch) {
     els.mdSearch.value = mdQuery;
+  }
+  if (els.mdStocksSearch && document.activeElement !== els.mdStocksSearch) {
+    els.mdStocksSearch.value = mdStocksQuery;
   }
   renderMdList();
 }
@@ -2224,6 +2309,28 @@ function mdChartSymbol(symbol, cat) {
   if (nseHit) return nseHit.tv;
   const usHit = STOCKS_US.find((s) => s.symbol === symbol);
   if (usHit) return usHit.tv;
+  // Free-text stocks: allow any symbol typed in search (e.g., ZOMATO -> BSE:ZOMATO, AMD -> NASDAQ:AMD)
+  if (symbol && (cat === "stocks" || cat === "stocks_nse" || cat === "stocks_us" || cat === "markets")) {
+    // If user typed full exchange:symbol, use as is
+    if (String(symbol).includes(":")) return String(symbol).toUpperCase();
+    // Otherwise construct based on current stocks subfilter (BSE for NSE/BSE tab, NASDAQ for US tab)
+    const upper = String(symbol).toUpperCase().trim();
+    if (upper) {
+      const isUS = cat === "stocks_us" || (typeof mdStocksSub !== "undefined" && mdStocksSub === "us") || (typeof snapStocksSub !== "undefined" && snapStocksSub === "us");
+      // For generic "stocks" or "markets" cat, check snapshot/market state to decide
+      if (cat === "stocks_nse") return `BSE:${upper}`;
+      if (cat === "stocks_us") return `NASDAQ:${upper}`;
+      if (isUS) return `NASDAQ:${upper}`;
+      // Default to BSE for Indian stocks (NSE/BSE tab) and for markets fallback
+      if (cat === "stocks" || cat === "markets") {
+        // Check if current snapshot or dropdown is in US mode
+        const snapIsUS = typeof snapStocksSub !== "undefined" && snapStocksSub === "us" && snapCat === "stocks";
+        const mdIsUS = typeof mdStocksSub !== "undefined" && mdStocksSub === "us" && mdCat === "stocks";
+        if (snapIsUS || mdIsUS) return `NASDAQ:${upper}`;
+        return `BSE:${upper}`;
+      }
+    }
+  }
   if (!report || !symbol) return null;
   // 1. Explicit overview mapping (majors + metals) — unchanged behavior.
   const known = [...(report.markets || []), ...(report.metals || [])]
@@ -2412,6 +2519,40 @@ if (els.mdSearch) {
   });
 }
 
+if (els.mdStocksSearch) {
+  els.mdStocksSearch.addEventListener("input", (event) => {
+    mdStocksQuery = event.target.value;
+    renderMdList();
+    // Try TradingView autocomplete in background (non-blocking)
+    const q = mdStocksQuery.trim();
+    if (q.length >= 1) {
+      const exch = mdStocksSub === "us" ? "NASDAQ" : "BSE";
+      fetchTradingViewSymbols(q, exch).then((suggestions) => {
+        if (suggestions && suggestions.length) {
+          // If API returned suggestions, we could merge them into display
+          // For now, re-render will already show free-text; API suggestions would be handled via stocksRowsFor if we stored them
+          // Store in cache and re-render
+          tvSearchCache[`${exch}:${q.toUpperCase()}`] = suggestions;
+          // Optionally inject suggestions into list by re-rendering with API data
+          // We will directly paint if current query still matches
+          if (mdStocksQuery.trim().toUpperCase() === q.toUpperCase() && mdCat === "stocks") {
+            // Build rows from API suggestions + free-text fallback
+            const apiRows = suggestions.map((s) => ({ symbol: s.symbol, name: s.name || s.symbol, price: null, change: null, tv: s.tv }));
+            // Merge with free-text custom if not already present
+            const customTv = `${exch}:${q.toUpperCase()}`;
+            if (!apiRows.some((r) => r.tv === customTv)) {
+              apiRows.unshift({ symbol: q.toUpperCase(), name: q.toUpperCase(), price: null, change: null, tv: customTv });
+            }
+            // Directly paint API rows
+            paintAssetRows(els.mdList, els.mdCount, apiRows, `${apiRows.length} asset${apiRows.length===1?"":"s"}`, mdCat);
+            mdLastRows = apiRows;
+          }
+        }
+      });
+    }
+  });
+}
+
 if (els.mdList) {
   els.mdList.addEventListener("click", (event) => {
     const row = event.target.closest(".md-row");
@@ -2478,6 +2619,31 @@ if (els.snapSearch) {
   els.snapSearch.addEventListener("input", (event) => {
     snapQuery = event.target.value;
     renderSnapList();
+  });
+}
+
+if (els.snapStocksSearch) {
+  els.snapStocksSearch.addEventListener("input", (event) => {
+    snapStocksQuery = event.target.value;
+    renderSnapList();
+    const q = snapStocksQuery.trim();
+    if (q.length >= 1) {
+      const exch = snapStocksSub === "us" ? "NASDAQ" : "BSE";
+      fetchTradingViewSymbols(q, exch).then((suggestions) => {
+        if (suggestions && suggestions.length) {
+          tvSearchCache[`${exch}:${q.toUpperCase()}`] = suggestions;
+          if (snapStocksQuery.trim().toUpperCase() === q.toUpperCase() && snapCat === "stocks") {
+            const apiRows = suggestions.map((s) => ({ symbol: s.symbol, name: s.name || s.symbol, price: null, change: null, tv: s.tv }));
+            const customTv = `${exch}:${q.toUpperCase()}`;
+            if (!apiRows.some((r) => r.tv === customTv)) {
+              apiRows.unshift({ symbol: q.toUpperCase(), name: q.toUpperCase(), price: null, change: null, tv: customTv });
+            }
+            paintAssetRows(els.snapList, els.snapCount, apiRows, `${apiRows.length} asset${apiRows.length===1?"":"s"}`, snapCat);
+            snapLastRows = apiRows;
+          }
+        }
+      });
+    }
   });
 }
 
