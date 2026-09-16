@@ -74,11 +74,15 @@ const els = {
   marketsDropdown: document.getElementById("markets-dropdown"),
   mdCats: document.querySelectorAll(".md-cat"),
   mdCFilters: document.querySelectorAll("#markets-dropdown [data-cfilter]"),
+  mdMarketsFilters: document.querySelectorAll("#markets-dropdown [data-mfilter]"),
+  mdStocksFilters: document.querySelectorAll("#markets-dropdown [data-sfilter]"),
   mdSearch: document.getElementById("md-search"),
   mdList: document.getElementById("md-list"),
   mdCount: document.getElementById("md-count"),
   snapTabs: document.querySelectorAll(".snap-tab"),
   snapFilters: document.querySelectorAll("[data-snapfilter]"),
+  snapMarketsFilters: document.querySelectorAll("[data-snapfilter-markets]"),
+  snapStocksFilters: document.querySelectorAll("[data-snapfilter-stocks]"),
   snapSearch: document.getElementById("snap-search"),
   snapList: document.getElementById("snap-list"),
   snapCount: document.getElementById("snap-count"),
@@ -124,12 +128,16 @@ const LARGE_CAP_MIN = 10000000000;
 let mdOpen = false;
 let mdCat = "crypto";
 let mdCryptoFilter = "all";
+let mdMarketsSub = "metals";
+let mdStocksSub = "nse";
 let mdQuery = "";
 let mdLastRows = [];
 
 // Inline snapshot panel state (mirrors the dropdown above)
 let snapCat = "crypto";
 let snapFilter = "all";
+let snapMarketsSub = "metals";
+let snapStocksSub = "nse";
 let snapQuery = "";
 let snapLastRows = [];
 
@@ -163,6 +171,28 @@ const WATCHLIST = [
   { symbol: "BNB", name: "BNB" },
   { symbol: "XRP", name: "XRP" },
   { symbol: "DOGE", name: "Dogecoin" },
+];
+
+const STOCKS_NSE_BSE = [
+  { symbol: "RELIANCE", name: "Reliance Industries", tv: "NSE:RELIANCE" },
+  { symbol: "TCS", name: "Tata Consultancy Services", tv: "NSE:TCS" },
+  { symbol: "INFY", name: "Infosys", tv: "NSE:INFY" },
+  { symbol: "HDFCBANK", name: "HDFC Bank", tv: "NSE:HDFCBANK" },
+  { symbol: "ICICIBANK", name: "ICICI Bank", tv: "NSE:ICICIBANK" },
+  { symbol: "SBIN", name: "State Bank of India", tv: "NSE:SBIN" },
+  { symbol: "BHARTIARTL", name: "Bharti Airtel", tv: "NSE:BHARTIARTL" },
+  { symbol: "ITC", name: "ITC", tv: "NSE:ITC" },
+];
+
+const STOCKS_US = [
+  { symbol: "AAPL", name: "Apple Inc.", tv: "NASDAQ:AAPL" },
+  { symbol: "MSFT", name: "Microsoft", tv: "NASDAQ:MSFT" },
+  { symbol: "GOOGL", name: "Alphabet", tv: "NASDAQ:GOOGL" },
+  { symbol: "TSLA", name: "Tesla", tv: "NASDAQ:TSLA" },
+  { symbol: "AMZN", name: "Amazon", tv: "NASDAQ:AMZN" },
+  { symbol: "NVDA", name: "NVIDIA", tv: "NASDAQ:NVDA" },
+  { symbol: "META", name: "Meta Platforms", tv: "NASDAQ:META" },
+  { symbol: "NFLX", name: "Netflix", tv: "NASDAQ:NFLX" },
 ];
 
 function formatUsd(value) {
@@ -1926,6 +1956,15 @@ function getDeltaTradeUrl(symbol, deltaSymbol) {
 }
 
 function mdCategoryAssets(cat) {
+  // Allow merged tab names to be passed with sub-filter resolution externally
+  if (cat === "markets") cat = "metals";
+  if (cat === "stocks") cat = "stocks_nse";
+  if (cat === "stocks_nse") {
+    return STOCKS_NSE_BSE.map((s) => ({ symbol: s.symbol, name: s.name, price: null, change: null, tv: s.tv }));
+  }
+  if (cat === "stocks_us") {
+    return STOCKS_US.map((s) => ({ symbol: s.symbol, name: s.name, price: null, change: null, tv: s.tv }));
+  }
   if (!report) return [];
   if (cat === "crypto") {
     return (report.crypto_full || []).map((c) => {
@@ -2053,8 +2092,22 @@ function renderSnapBrowser() {
   els.snapFilters.forEach((btn) => {
     btn.classList.toggle("is-active", btn.dataset.snapfilter === snapFilter);
   });
+  if (els.snapMarketsFilters) {
+    els.snapMarketsFilters.forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.snapfilterMarkets === snapMarketsSub);
+    });
+  }
+  if (els.snapStocksFilters) {
+    els.snapStocksFilters.forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.snapfilterStocks === snapStocksSub);
+    });
+  }
   const tools = document.getElementById("snap-crypto-tools");
   if (tools) tools.hidden = snapCat !== "crypto";
+  const marketsTools = document.getElementById("snap-markets-tools");
+  if (marketsTools) marketsTools.hidden = snapCat !== "markets";
+  const stocksTools = document.getElementById("snap-stocks-tools");
+  if (stocksTools) stocksTools.hidden = snapCat !== "stocks";
   if (els.snapSearch && document.activeElement !== els.snapSearch) {
     els.snapSearch.value = snapQuery;
   }
@@ -2069,6 +2122,13 @@ function renderSnapList() {
     const result = mdCryptoRows(snapQuery, snapFilter);
     rows = result.rows;
     label = result.label;
+  } else if (snapCat === "markets") {
+    rows = mdCategoryAssets(snapMarketsSub);
+    label = `${rows.length} asset${rows.length === 1 ? "" : "s"}`;
+  } else if (snapCat === "stocks") {
+    const stockCat = snapStocksSub === "us" ? "stocks_us" : "stocks_nse";
+    rows = mdCategoryAssets(stockCat);
+    label = `${rows.length} asset${rows.length === 1 ? "" : "s"}`;
   } else {
     rows = mdCategoryAssets(snapCat);
     label = `${rows.length} asset${rows.length === 1 ? "" : "s"}`;
@@ -2088,6 +2148,13 @@ function renderMdList() {
     const result = mdCryptoRows();
     rows = result.rows;
     label = result.label;
+  } else if (mdCat === "markets") {
+    rows = mdCategoryAssets(mdMarketsSub);
+    label = `${rows.length} asset${rows.length === 1 ? "" : "s"}`;
+  } else if (mdCat === "stocks") {
+    const stockCat = mdStocksSub === "us" ? "stocks_us" : "stocks_nse";
+    rows = mdCategoryAssets(stockCat);
+    label = `${rows.length} asset${rows.length === 1 ? "" : "s"}`;
   } else {
     rows = mdCategoryAssets(mdCat);
     label = `${rows.length} asset${rows.length === 1 ? "" : "s"}`;
@@ -2103,8 +2170,22 @@ function renderMarketsDropdown() {
   els.mdCFilters.forEach((btn) => {
     btn.classList.toggle("is-active", btn.dataset.cfilter === mdCryptoFilter);
   });
+  if (els.mdMarketsFilters) {
+    els.mdMarketsFilters.forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.mfilter === mdMarketsSub);
+    });
+  }
+  if (els.mdStocksFilters) {
+    els.mdStocksFilters.forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.sfilter === mdStocksSub);
+    });
+  }
   const tools = document.getElementById("md-crypto-tools");
   if (tools) tools.hidden = mdCat !== "crypto";
+  const marketsTools = document.getElementById("md-markets-tools");
+  if (marketsTools) marketsTools.hidden = mdCat !== "markets";
+  const stocksTools = document.getElementById("md-stocks-tools");
+  if (stocksTools) stocksTools.hidden = mdCat !== "stocks";
   if (els.mdSearch && document.activeElement !== els.mdSearch) {
     els.mdSearch.value = mdQuery;
   }
@@ -2138,6 +2219,11 @@ const FOREX_TV_OVERRIDES = {
 };
 
 function mdChartSymbol(symbol, cat) {
+  // Stocks: direct tv mapping from static lists (same TradingView pattern as metals/forex)
+  const nseHit = STOCKS_NSE_BSE.find((s) => s.symbol === symbol);
+  if (nseHit) return nseHit.tv;
+  const usHit = STOCKS_US.find((s) => s.symbol === symbol);
+  if (usHit) return usHit.tv;
   if (!report || !symbol) return null;
   // 1. Explicit overview mapping (majors + metals) — unchanged behavior.
   const known = [...(report.markets || []), ...(report.metals || [])]
@@ -2146,10 +2232,11 @@ function mdChartSymbol(symbol, cat) {
   // 2. Commodities table (also covers metals like PLAT).
   if (COMMODITY_TV[symbol]) return COMMODITY_TV[symbol];
   // 3. Forex pairs (default OANDA spot CFDs, all validated except overrides).
-  if (cat === "forex") {
-    if (symbol in FOREX_TV_OVERRIDES) return FOREX_TV_OVERRIDES[symbol];
-    return `OANDA:${symbol}`;
-  }
+  if (symbol in FOREX_TV_OVERRIDES) return FOREX_TV_OVERRIDES[symbol];
+  const cf = report.commodities_forex || [];
+  const isForex = cf.some((m) => m.symbol === symbol && m.group === "forex");
+  if (isForex) return `OANDA:${symbol}`;
+  if (cat === "forex") return `OANDA:${symbol}`;
   // 4. Validated Binance spot symbol from the backend (never guessed).
   const coin = (report.crypto_full || []).find((c) => c.symbol === symbol);
   if (coin) return coin.chart_symbol || null;
@@ -2165,7 +2252,7 @@ function closeAssetDetail() {
 }
 
 function assetDetailHtml(r, cat) {
-  const catLabel = { crypto: "Crypto", metals: "Metals", commodities: "Commodities", forex: "Forex" }[cat] || cat;
+  const catLabel = { crypto: "Crypto", metals: "Metals", commodities: "Commodities", forex: "Forex", markets: "Markets", stocks: "Stocks", stocks_nse: "Stocks", stocks_us: "Stocks" }[cat] || cat;
   const chg = r.change;
   const chgHtml =
     chg === null || chg === undefined || isNaN(chg)
@@ -2300,6 +2387,24 @@ els.mdCFilters.forEach((btn) => {
   });
 });
 
+if (els.mdMarketsFilters) {
+  els.mdMarketsFilters.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      mdMarketsSub = btn.dataset.mfilter;
+      renderMarketsDropdown();
+    });
+  });
+}
+
+if (els.mdStocksFilters) {
+  els.mdStocksFilters.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      mdStocksSub = btn.dataset.sfilter;
+      renderMarketsDropdown();
+    });
+  });
+}
+
 if (els.mdSearch) {
   els.mdSearch.addEventListener("input", (event) => {
     mdQuery = event.target.value;
@@ -2350,6 +2455,24 @@ els.snapFilters.forEach((btn) => {
     renderSnapBrowser();
   });
 });
+
+if (els.snapMarketsFilters) {
+  els.snapMarketsFilters.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      snapMarketsSub = btn.dataset.snapfilterMarkets;
+      renderSnapBrowser();
+    });
+  });
+}
+
+if (els.snapStocksFilters) {
+  els.snapStocksFilters.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      snapStocksSub = btn.dataset.snapfilterStocks;
+      renderSnapBrowser();
+    });
+  });
+}
 
 if (els.snapSearch) {
   els.snapSearch.addEventListener("input", (event) => {

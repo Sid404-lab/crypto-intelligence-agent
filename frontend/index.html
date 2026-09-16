@@ -163,9 +163,8 @@
           <div id="markets-dropdown" class="markets-dropdown" hidden role="dialog" aria-label="Browse markets">
             <div class="md-cats" role="group" aria-label="Asset categories">
               <button type="button" class="md-cat is-active" data-cat="crypto">Crypto</button>
-              <button type="button" class="md-cat" data-cat="metals">Metals</button>
-              <button type="button" class="md-cat" data-cat="commodities">Commodities</button>
-              <button type="button" class="md-cat" data-cat="forex">Forex</button>
+              <button type="button" class="md-cat" data-cat="markets">Markets</button>
+              <button type="button" class="md-cat" data-cat="stocks">Stocks</button>
             </div>
             <div class="md-main">
               <div class="md-crypto-tools" id="md-crypto-tools">
@@ -177,6 +176,19 @@
                 </div>
                 <label class="sr-only" for="md-search">Search crypto</label>
                 <input id="md-search" class="md-search" type="search" placeholder="Search symbol or name…" autocomplete="off" />
+              </div>
+              <div class="md-markets-tools" id="md-markets-tools" hidden>
+                <div class="md-subfilters" role="group" aria-label="Markets filters">
+                  <button type="button" data-mfilter="metals" class="is-active">Metals</button>
+                  <button type="button" data-mfilter="commodities">Commodities</button>
+                  <button type="button" data-mfilter="forex">Forex</button>
+                </div>
+              </div>
+              <div class="md-stocks-tools" id="md-stocks-tools" hidden>
+                <div class="md-subfilters" role="group" aria-label="Stocks filters">
+                  <button type="button" data-sfilter="nse" class="is-active">NSE/BSE</button>
+                  <button type="button" data-sfilter="us">NYSE/NASDAQ</button>
+                </div>
               </div>
               <div id="md-list" class="md-list" role="list"></div>
               <p id="md-count" class="md-count" aria-live="polite"></p>
@@ -469,9 +481,8 @@
               </div>
               <div class="snap-tabs" role="tablist" aria-label="Snapshot categories">
                 <button type="button" class="snap-tab is-active" data-snapcat="crypto" role="tab" aria-selected="true">Crypto</button>
-                <button type="button" class="snap-tab" data-snapcat="metals" role="tab" aria-selected="false">Metals</button>
-                <button type="button" class="snap-tab" data-snapcat="commodities" role="tab" aria-selected="false">Commodities</button>
-                <button type="button" class="snap-tab" data-snapcat="forex" role="tab" aria-selected="false">Forex</button>
+                <button type="button" class="snap-tab" data-snapcat="markets" role="tab" aria-selected="false">Markets</button>
+                <button type="button" class="snap-tab" data-snapcat="stocks" role="tab" aria-selected="false">Stocks</button>
               </div>
             </header>
             <div class="snap-body" id="snap-body">
@@ -484,6 +495,19 @@
                 </div>
                 <label class="sr-only" for="snap-search">Search snapshot crypto</label>
                 <input id="snap-search" class="md-search" type="search" placeholder="Search symbol or name…" autocomplete="off" />
+              </div>
+              <div class="snap-markets-tools" id="snap-markets-tools" hidden>
+                <div class="md-subfilters" role="group" aria-label="Snapshot markets filters">
+                  <button type="button" data-snapfilter-markets="metals" class="is-active">Metals</button>
+                  <button type="button" data-snapfilter-markets="commodities">Commodities</button>
+                  <button type="button" data-snapfilter-markets="forex">Forex</button>
+                </div>
+              </div>
+              <div class="snap-stocks-tools" id="snap-stocks-tools" hidden>
+                <div class="md-subfilters" role="group" aria-label="Snapshot stocks filters">
+                  <button type="button" data-snapfilter-stocks="nse" class="is-active">NSE/BSE</button>
+                  <button type="button" data-snapfilter-stocks="us">NYSE/NASDAQ</button>
+                </div>
               </div>
               <div id="snap-list" class="md-list" role="list"></div>
               <p id="snap-count" class="md-count" aria-live="polite"></p>

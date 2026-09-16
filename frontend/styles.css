@@ -493,7 +493,11 @@ body {
 }
 
 .markets-dropdown[hidden],
-.md-crypto-tools[hidden] {
+.md-crypto-tools[hidden],
+.md-markets-tools[hidden],
+.md-stocks-tools[hidden],
+.snap-markets-tools[hidden],
+.snap-stocks-tools[hidden] {
   display: none !important;
 }
 
