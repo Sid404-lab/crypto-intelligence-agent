@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-09-26T00:46:02Z",
+  "generated_at": "2026-09-26T00:50:56Z",
   "markets": [
     {
       "symbol": "BTC",
       "name": "Bitcoin",
-      "price": 83893.1,
-      "change_24h": -0.8419,
-      "volume": 1153993992.9674869,
+      "price": 83927.1,
+      "change_24h": -0.8788,
+      "volume": 1154009311.9924865,
       "market_cap": 0,
       "source": "Delta India",
       "sources": [
@@ -18,17 +18,17 @@
       "india": {
         "venue": "Delta India",
         "contract": "BTCUSD",
-        "spot_price": 83893.1,
-        "change_24h": -0.8419,
-        "volume": 1153993992.9674869
+        "spot_price": 83927.1,
+        "change_24h": -0.8788,
+        "volume": 1154009311.9924865
       }
     },
     {
       "symbol": "ETH",
       "name": "Ethereum",
-      "price": 2686.05,
-      "change_24h": -0.1544,
-      "volume": 764337548.9825089,
+      "price": 2687.82,
+      "change_24h": -0.1122,
+      "volume": 763985253.9815092,
       "market_cap": 0,
       "source": "Delta India",
       "sources": [
@@ -40,17 +40,17 @@
       "india": {
         "venue": "Delta India",
         "contract": "ETHUSD",
-        "spot_price": 2686.05,
-        "change_24h": -0.1544,
-        "volume": 764337548.9825089
+        "spot_price": 2687.82,
+        "change_24h": -0.1122,
+        "volume": 763985253.9815092
       }
     },
     {
       "symbol": "SOL",
       "name": "Solana",
-      "price": 121.599,
-      "change_24h": 3.6803,
-      "volume": 294283567.9469025,
+      "price": 121.692,
+      "change_24h": 3.5968,
+      "volume": 294343937.7303027,
       "market_cap": 0,
       "source": "Delta India",
       "sources": [
@@ -62,17 +62,17 @@
       "india": {
         "venue": "Delta India",
         "contract": "SOLUSD",
-        "spot_price": 121.599,
-        "change_24h": 3.6803,
-        "volume": 294283567.9469025
+        "spot_price": 121.692,
+        "change_24h": 3.5968,
+        "volume": 294343937.7303027
       }
     },
     {
       "symbol": "BNB",
       "name": "BNB",
-      "price": 775.72,
-      "change_24h": -0.2411,
-      "volume": 2455189.1343,
+      "price": 776.42,
+      "change_24h": -0.2006,
+      "volume": 2456659.8133,
       "market_cap": 0,
       "source": "Delta India",
       "sources": [
@@ -84,17 +84,17 @@
       "india": {
         "venue": "Delta India",
         "contract": "BNBUSD",
-        "spot_price": 775.72,
-        "change_24h": -0.2411,
-        "volume": 2455189.1343
+        "spot_price": 776.42,
+        "change_24h": -0.2006,
+        "volume": 2456659.8133
       }
     },
     {
       "symbol": "XRP",
       "name": "XRP",
-      "price": 1.5614,
-      "change_24h": 0.8451,
-      "volume": 30551623.22289998,
+      "price": 1.56513333,
+      "change_24h": 1.1156,
+      "volume": 30594187.57259998,
       "market_cap": 0,
       "source": "Delta India",
       "sources": [
@@ -106,17 +106,17 @@
       "india": {
         "venue": "Delta India",
         "contract": "XRPUSD",
-        "spot_price": 1.5614,
-        "change_24h": 0.8451,
-        "volume": 30551623.22289998
+        "spot_price": 1.56513333,
+        "change_24h": 1.1156,
+        "volume": 30594187.57259998
       }
     },
     {
       "symbol": "DOGE",
       "name": "Dogecoin",
-      "price": 0.098476,
-      "change_24h": 2.3049,
-      "volume": 12120051.800300023,
+      "price": 0.098578,
+      "change_24h": 2.2892,
+      "volume": 12120513.964300022,
       "market_cap": 0,
       "source": "Delta India",
       "sources": [
@@ -128,9 +128,9 @@
       "india": {
         "venue": "Delta India",
         "contract": "DOGEUSD",
-        "spot_price": 0.098476,
-        "change_24h": 2.3049,
-        "volume": 12120051.800300023
+        "spot_price": 0.098578,
+        "change_24h": 2.2892,
+        "volume": 12120513.964300022
       }
     }
   ],
@@ -322,10 +322,10 @@
     {
       "symbol": "AKE",
       "name": "Akedo",
-      "price": 0.03305705,
-      "change_24h": -6.5659,
-      "volume": 42747409.77899978,
-      "trending_score": 23.13,
+      "price": 0.03310916,
+      "change_24h": -4.8884,
+      "volume": 42700046.56799976,
+      "trending_score": 19.78,
       "contract": "AKEUSD",
       "url": "https://www.delta.exchange/app/futures/trade/AKEUSD",
       "source": "Delta India"
@@ -340,6 +340,17 @@
       "contract": "LINK",
       "url": "https://www.coingecko.com/en/coins/chainlink",
       "source": "CoinGecko"
+    },
+    {
+      "symbol": "AIGENSYN",
+      "name": "Gensyn",
+      "price": 0.02179669,
+      "change_24h": 6.8026,
+      "volume": 66839.394,
+      "trending_score": 13.67,
+      "contract": "AIGENSYNUSD",
+      "url": "https://www.delta.exchange/app/futures/trade/AIGENSYNUSD",
+      "source": "Delta India"
     },
     {
       "symbol": "PONS",
@@ -366,46 +377,35 @@
     {
       "symbol": "CRCLX",
       "name": "Circle xStock Token",
-      "price": 87.53,
-      "change_24h": -5.6888,
-      "volume": 516857.475,
-      "trending_score": 11.89,
+      "price": 87.67,
+      "change_24h": -5.6271,
+      "volume": 517302.49,
+      "trending_score": 11.77,
       "contract": "CRCLXUSD",
       "url": "https://www.delta.exchange/app/futures/trade/CRCLXUSD",
       "source": "Delta India"
     },
     {
-      "symbol": "SLVON",
-      "name": "iShares Silver (XAG) Trust ONDO Token",
-      "price": 57.87,
-      "change_24h": 0.745,
-      "volume": 10636876.08699992,
-      "trending_score": 11.49,
-      "contract": "SLVONUSD",
-      "url": "https://www.delta.exchange/app/futures/trade/SLVONUSD",
-      "source": "Delta India"
-    },
-    {
       "symbol": "ENJ",
       "name": "Enjin Coin",
-      "price": 0.02962571,
-      "change_24h": 5.6387,
+      "price": 0.029662,
+      "change_24h": 5.6888,
       "volume": 15148.297999999995,
-      "trending_score": 11.29,
+      "trending_score": 11.39,
       "contract": "ENJUSD",
       "url": "https://www.delta.exchange/app/futures/trade/ENJUSD",
       "source": "Delta India"
     },
     {
-      "symbol": "SEI",
-      "name": "Sei",
-      "price": null,
-      "change_24h": null,
-      "volume": null,
-      "trending_score": 11,
-      "contract": "SEI",
-      "url": "https://www.coingecko.com/en/coins/sei-network",
-      "source": "CoinGecko"
+      "symbol": "SLVON",
+      "name": "iShares Silver (XAG) Trust ONDO Token",
+      "price": 57.86,
+      "change_24h": 0.6796,
+      "volume": 10635883.044999916,
+      "trending_score": 11.36,
+      "contract": "SLVONUSD",
+      "url": "https://www.delta.exchange/app/futures/trade/SLVONUSD",
+      "source": "Delta India"
     }
   ],
   "metals": [
@@ -740,9 +740,9 @@
     {
       "symbol": "BTC",
       "name": "Bitcoin Perpetual",
-      "price": 83853.53536491,
-      "change_24h_pct": -0.8419,
-      "volume": 1153993992.9674869,
+      "price": 83883.06963842,
+      "change_24h_pct": -0.8784,
+      "volume": 1154009311.9924865,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "BTCUSD"
@@ -750,9 +750,9 @@
     {
       "symbol": "ETH",
       "name": "Ethereum Perpetual",
-      "price": 2684.88129312,
-      "change_24h_pct": -0.1544,
-      "volume": 764337548.9825089,
+      "price": 2687.06716331,
+      "change_24h_pct": -0.1106,
+      "volume": 763985253.9815092,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "ETHUSD"
@@ -760,9 +760,9 @@
     {
       "symbol": "SOL",
       "name": "Solana Perpetual",
-      "price": 121.61506523,
-      "change_24h_pct": 3.6803,
-      "volume": 294283567.9469025,
+      "price": 121.71122744,
+      "change_24h_pct": 3.6078,
+      "volume": 294343937.7303027,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "SOLUSD"
@@ -770,9 +770,9 @@
     {
       "symbol": "AKE",
       "name": "Akedo Perpetual",
-      "price": 0.03303302,
-      "change_24h_pct": -6.5659,
-      "volume": 42747409.77899978,
+      "price": 0.03309985,
+      "change_24h_pct": -4.8884,
+      "volume": 42700046.56799976,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "AKEUSD"
@@ -780,9 +780,9 @@
     {
       "symbol": "XRP",
       "name": "Ripple Perpetual",
-      "price": 1.56207718,
-      "change_24h_pct": 0.8451,
-      "volume": 30551623.22289998,
+      "price": 1.56622083,
+      "change_24h_pct": 1.1227,
+      "volume": 30594187.57259998,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "XRPUSD"
@@ -790,9 +790,9 @@
     {
       "symbol": "UNI",
       "name": "Uniswap Perpetual",
-      "price": 9.53631777,
-      "change_24h_pct": 4.2576,
-      "volume": 20854726.430799946,
+      "price": 9.53461616,
+      "change_24h_pct": 3.8981,
+      "volume": 20850742.490799937,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "UNIUSD"
@@ -800,9 +800,9 @@
     {
       "symbol": "LTC",
       "name": "Litecoin Perpetual",
-      "price": 72.51727927,
-      "change_24h_pct": 1.5491,
-      "volume": 16194097.41299999,
+      "price": 72.93058891,
+      "change_24h_pct": 1.817,
+      "volume": 16209500.60199999,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "LTCUSD"
@@ -810,9 +810,9 @@
     {
       "symbol": "ZEC",
       "name": "Zcash Perpetual",
-      "price": 1540.05199553,
-      "change_24h_pct": -0.5082,
-      "volume": 15244801.422999995,
+      "price": 1544.36486161,
+      "change_24h_pct": -0.3877,
+      "volume": 15237781.885999994,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "ZECUSD"
@@ -820,9 +820,9 @@
     {
       "symbol": "LINK",
       "name": "Chainlink Perpetual",
-      "price": 13.95787415,
-      "change_24h_pct": 5.2403,
-      "volume": 13250492.004,
+      "price": 14.01672915,
+      "change_24h_pct": 5.5438,
+      "volume": 13260414.339000002,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "LINKUSD"
@@ -830,9 +830,9 @@
     {
       "symbol": "DOGE",
       "name": "Dogecoin Perpetual",
-      "price": 0.09858412,
-      "change_24h_pct": 2.3049,
-      "volume": 12120051.800300023,
+      "price": 0.09868804,
+      "change_24h_pct": 2.2953,
+      "volume": 12120513.964300022,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "DOGEUSD"
@@ -840,9 +840,9 @@
     {
       "symbol": "ONDO",
       "name": "ONDO Perpetual",
-      "price": 0.54360616,
-      "change_24h_pct": 3.6221,
-      "volume": 10971497.773999995,
+      "price": 0.54635601,
+      "change_24h_pct": 4.6172,
+      "volume": 10972681.713999994,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "ONDOUSD"
@@ -850,9 +850,9 @@
     {
       "symbol": "BCH",
       "name": "Bitcoin Cash Perpetual",
-      "price": 340.86692852,
-      "change_24h_pct": 0.5931,
-      "volume": 9702060.320000015,
+      "price": 340.9991183,
+      "change_24h_pct": 0.3897,
+      "volume": 9693177.392500017,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "BCHUSD"
@@ -860,9 +860,9 @@
     {
       "symbol": "SAGA",
       "name": "Saga Perpetual",
-      "price": 0.0344371,
-      "change_24h_pct": -48.6463,
-      "volume": 8524286.77737002,
+      "price": 0.03455659,
+      "change_24h_pct": -40.4672,
+      "volume": 8389628.621170016,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "SAGAUSD"
@@ -870,9 +870,9 @@
     {
       "symbol": "AAVE",
       "name": "Aave Perpetual",
-      "price": 154.51661344,
-      "change_24h_pct": 5.6208,
-      "volume": 7803817.316999996,
+      "price": 154.58536574,
+      "change_24h_pct": 5.529,
+      "volume": 7799756.536999995,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "AAVEUSD"
@@ -880,9 +880,9 @@
     {
       "symbol": "MUBARAK",
       "name": "Mubarak Perpetual",
-      "price": 0.05668834,
-      "change_24h_pct": 27.4994,
-      "volume": 7305227.918600008,
+      "price": 0.05777644,
+      "change_24h_pct": 30.169,
+      "volume": 7333659.091600006,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "MUBARAKUSD"
@@ -890,9 +890,9 @@
     {
       "symbol": "XPL",
       "name": "Plasma Perpetual",
-      "price": 0.11238902,
-      "change_24h_pct": -1.0418,
-      "volume": 7161063.335999961,
+      "price": 0.11292265,
+      "change_24h_pct": -0.9386,
+      "volume": 7167425.564999962,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "XPLUSD"
@@ -900,9 +900,9 @@
     {
       "symbol": "RARE",
       "name": "SuperRare Perpetual",
-      "price": 0.01503081,
-      "change_24h_pct": 14.6147,
-      "volume": 5836361.906999995,
+      "price": 0.01498017,
+      "change_24h_pct": 14.0402,
+      "volume": 5851151.294999994,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "RAREUSD"
@@ -910,9 +910,9 @@
     {
       "symbol": "AVAX",
       "name": "Avalanche Perpetual",
-      "price": 10.62747897,
-      "change_24h_pct": 3.9879,
-      "volume": 5730861.568900004,
+      "price": 10.62805678,
+      "change_24h_pct": 4.0817,
+      "volume": 5729198.300400004,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "AVAXUSD"
@@ -920,9 +920,9 @@
     {
       "symbol": "ENA",
       "name": "Ethena Perpetual",
-      "price": 0.27088557,
-      "change_24h_pct": 18.2666,
-      "volume": 4031171.6933400016,
+      "price": 0.26828293,
+      "change_24h_pct": 15.5144,
+      "volume": 4020942.752500002,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "ENAUSD"
@@ -930,9 +930,9 @@
     {
       "symbol": "SUI",
       "name": "SUI Perpetual",
-      "price": 1.18366489,
-      "change_24h_pct": 14.9453,
-      "volume": 3722062.1740999985,
+      "price": 1.17975492,
+      "change_24h_pct": 14.427,
+      "volume": 3722498.035799999,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "SUIUSD"
@@ -940,8 +940,8 @@
     {
       "symbol": "NEAR",
       "name": "NEAR Perpetual",
-      "price": 4.92661991,
-      "change_24h_pct": 7.2677,
+      "price": 4.94114049,
+      "change_24h_pct": 7.2934,
       "volume": 3122478.8292000107,
       "market_cap": null,
       "chart_symbol": null,
@@ -950,9 +950,9 @@
     {
       "symbol": "H",
       "name": "Humanity Perpetual",
-      "price": 0.07707328,
-      "change_24h_pct": 15.1801,
-      "volume": 3088748.926000006,
+      "price": 0.0773654,
+      "change_24h_pct": 16.1471,
+      "volume": 3087638.2370000063,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "HUSD"
@@ -960,9 +960,9 @@
     {
       "symbol": "XAI",
       "name": "XAI Perpetual",
-      "price": 0.00934392,
-      "change_24h_pct": -0.7172,
-      "volume": 2693716.6801400036,
+      "price": 0.00944683,
+      "change_24h_pct": 0.4529,
+      "volume": 2669957.2618000032,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "XAIUSD"
@@ -970,9 +970,9 @@
     {
       "symbol": "BNB",
       "name": "BNB Perpetual",
-      "price": 775.58439683,
-      "change_24h_pct": -0.2411,
-      "volume": 2455189.1343,
+      "price": 776.31616151,
+      "change_24h_pct": -0.2021,
+      "volume": 2456659.8133,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "BNBUSD"
@@ -980,9 +980,9 @@
     {
       "symbol": "VVV",
       "name": "Venice Token Perpetual",
-      "price": 30.43613925,
-      "change_24h_pct": -1.8874,
-      "volume": 1892609.1490000002,
+      "price": 30.37023625,
+      "change_24h_pct": -2.0185,
+      "volume": 1895079.3720000004,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "VVVUSD"
@@ -990,9 +990,9 @@
     {
       "symbol": "HYPE",
       "name": "Hyperliquid Perpetual",
-      "price": 91.76338237,
-      "change_24h_pct": 0.4996,
-      "volume": 1538367.6430999995,
+      "price": 91.91421184,
+      "change_24h_pct": 0.5862,
+      "volume": 1537574.1178999995,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "HYPEUSD"
@@ -1000,9 +1000,9 @@
     {
       "symbol": "ADA",
       "name": "Cardano Perpetual",
-      "price": 0.25734905,
-      "change_24h_pct": 3.2179,
-      "volume": 1314347.6973500035,
+      "price": 0.25781611,
+      "change_24h_pct": 3.1981,
+      "volume": 1314342.7088500035,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "ADAUSD"
@@ -1010,9 +1010,9 @@
     {
       "symbol": "DOT",
       "name": "Polkadot Perpetual",
-      "price": 1.20796735,
-      "change_24h_pct": 4.5908,
-      "volume": 1307847.0450000006,
+      "price": 1.21158728,
+      "change_24h_pct": 4.6753,
+      "volume": 1308905.9890000005,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "DOTUSD"
@@ -1020,9 +1020,9 @@
     {
       "symbol": "CHIP",
       "name": "CHIP Perpetual",
-      "price": 0.04966165,
-      "change_24h_pct": 3.9492,
-      "volume": 1147853.6909999992,
+      "price": 0.04981238,
+      "change_24h_pct": 4.2354,
+      "volume": 1148277.4609999992,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "CHIPUSD"
@@ -1030,9 +1030,9 @@
     {
       "symbol": "SEI",
       "name": "SEI Perpetual",
-      "price": 0.07498741,
-      "change_24h_pct": 19.7859,
-      "volume": 1009434.9761999999,
+      "price": 0.07537655,
+      "change_24h_pct": 20.36,
+      "volume": 1011778.5955,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "SEIUSD"
@@ -1040,9 +1040,9 @@
     {
       "symbol": "JTO",
       "name": "Jito Perpetual",
-      "price": 0.57085206,
-      "change_24h_pct": 14.5331,
-      "volume": 937093.8374999964,
+      "price": 0.57196283,
+      "change_24h_pct": 14.765,
+      "volume": 937109.7902999965,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "JTOUSD"
@@ -1050,9 +1050,9 @@
     {
       "symbol": "RIVER",
       "name": "River Perpetual",
-      "price": 1.25364731,
-      "change_24h_pct": -0.2298,
-      "volume": 885540.4009999996,
+      "price": 1.25483822,
+      "change_24h_pct": -0.2765,
+      "volume": 885563.7769999995,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "RIVERUSD"
@@ -1060,9 +1060,9 @@
     {
       "symbol": "DEEP",
       "name": "DeepBook Perpetual",
-      "price": 0.0226831,
-      "change_24h_pct": 11.2436,
-      "volume": 708070.5616999988,
+      "price": 0.02261598,
+      "change_24h_pct": 11.1924,
+      "volume": 707028.249099999,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "DEEPUSD"
@@ -1070,9 +1070,9 @@
     {
       "symbol": "LDO",
       "name": "Lido DAO Perpetual",
-      "price": 0.48465469,
-      "change_24h_pct": 11.2521,
-      "volume": 527472.1247999999,
+      "price": 0.48711408,
+      "change_24h_pct": 11.5457,
+      "volume": 527250.5062,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "LDOUSD"
@@ -1080,9 +1080,9 @@
     {
       "symbol": "POL",
       "name": "Polygon Perpetual",
-      "price": 0.11631999,
-      "change_24h_pct": 7.3726,
-      "volume": 449964.27430000005,
+      "price": 0.11622624,
+      "change_24h_pct": 6.8336,
+      "volume": 437185.1426,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "POLUSD"
@@ -1090,9 +1090,9 @@
     {
       "symbol": "TAO",
       "name": "Bittensor Perpetual",
-      "price": 313.15565591,
-      "change_24h_pct": 5.1587,
-      "volume": 374721.42650000006,
+      "price": 313.73150794,
+      "change_24h_pct": 5.4747,
+      "volume": 374627.9055000001,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "TAOUSD"
@@ -1100,9 +1100,9 @@
     {
       "symbol": "FIL",
       "name": "Filecoin Perpetual",
-      "price": 1.04492408,
-      "change_24h_pct": 5.2934,
-      "volume": 367375.9551,
+      "price": 1.04488972,
+      "change_24h_pct": 5.4202,
+      "volume": 367373.19169999997,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "FILUSD"
@@ -1110,9 +1110,9 @@
     {
       "symbol": "BEAT",
       "name": "Audiera Perpetual",
-      "price": 0.09531894,
-      "change_24h_pct": 0.367,
-      "volume": 339814.35799999983,
+      "price": 0.0954956,
+      "change_24h_pct": 0.4299,
+      "volume": 338800.7609999998,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "BEATUSD"
@@ -1120,9 +1120,9 @@
     {
       "symbol": "M",
       "name": "MemeCore Perpetual",
-      "price": 1.20648399,
-      "change_24h_pct": -1.0694,
-      "volume": 329688.50100000005,
+      "price": 1.20502615,
+      "change_24h_pct": -1.133,
+      "volume": 328602.5710000001,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "MUSD"
@@ -1130,8 +1130,8 @@
     {
       "symbol": "ARB",
       "name": "Arbitrum Perpetual",
-      "price": 0.22432862,
-      "change_24h_pct": 3.5323,
+      "price": 0.22409697,
+      "change_24h_pct": 2.7805,
       "volume": 303279.56166999973,
       "market_cap": null,
       "chart_symbol": null,
@@ -1140,9 +1140,9 @@
     {
       "symbol": "DASH",
       "name": "Dash Perpetual",
-      "price": 62.73526892,
-      "change_24h_pct": -0.8236,
-      "volume": 294090.5969999999,
+      "price": 62.90592232,
+      "change_24h_pct": -0.5454,
+      "volume": 294084.2749999999,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "DASHUSD"
@@ -1150,9 +1150,9 @@
     {
       "symbol": "LIT",
       "name": "Lighter Perpetual",
-      "price": 4.80196091,
-      "change_24h_pct": -4.4708,
-      "volume": 274876.3389999998,
+      "price": 4.80810619,
+      "change_24h_pct": -4.4112,
+      "volume": 274071.35199999984,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "LITUSD"
@@ -1160,9 +1160,9 @@
     {
       "symbol": "AIN",
       "name": "Infinity Ground Perpetual",
-      "price": 0.0214526,
-      "change_24h_pct": -6.641,
-      "volume": 267702.44,
+      "price": 0.02149274,
+      "change_24h_pct": -6.4035,
+      "volume": 266728.563,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "AINUSD"
@@ -1170,9 +1170,9 @@
     {
       "symbol": "LAB",
       "name": "LAB Perpetual",
-      "price": 0.0588482,
-      "change_24h_pct": -0.6795,
-      "volume": 263112.0851999999,
+      "price": 0.05884312,
+      "change_24h_pct": -0.5577,
+      "volume": 263228.0590999999,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "LABUSD"
@@ -1180,9 +1180,9 @@
     {
       "symbol": "ZRO",
       "name": "LayerZero Perpetual",
-      "price": 1.60838909,
-      "change_24h_pct": 12.7258,
-      "volume": 260022.2126000002,
+      "price": 1.61003511,
+      "change_24h_pct": 12.7087,
+      "volume": 260030.25730000023,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "ZROUSD"
@@ -1190,8 +1190,8 @@
     {
       "symbol": "XLM",
       "name": "Stellar Perpetual",
-      "price": 0.2188672,
-      "change_24h_pct": -1.733,
+      "price": 0.21970652,
+      "change_24h_pct": -1.0515,
       "volume": 258043.91494999998,
       "market_cap": null,
       "chart_symbol": null,
@@ -1200,8 +1200,8 @@
     {
       "symbol": "CAKE",
       "name": "PancakeSwap Perpetual",
-      "price": 2.7820235,
-      "change_24h_pct": 1.5576,
+      "price": 2.7839638,
+      "change_24h_pct": 1.5076,
       "volume": 255764.4292,
       "market_cap": null,
       "chart_symbol": null,
@@ -1210,9 +1210,9 @@
     {
       "symbol": "XMR",
       "name": "Monero Perpetual",
-      "price": 557.18141941,
-      "change_24h_pct": -1.6973,
-      "volume": 250918.3308,
+      "price": 556.38327327,
+      "change_24h_pct": -1.9576,
+      "volume": 251035.37429999997,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "XMRUSD"
@@ -1220,8 +1220,8 @@
     {
       "symbol": "INJ",
       "name": "Injective Perpetual",
-      "price": 8.0186958,
-      "change_24h_pct": 0.968,
+      "price": 7.97792244,
+      "change_24h_pct": 0.3728,
       "volume": 245728.28600000002,
       "market_cap": null,
       "chart_symbol": null,
@@ -1230,9 +1230,9 @@
     {
       "symbol": "BLESS",
       "name": "Bless Perpetual",
-      "price": 0.00963774,
-      "change_24h_pct": 0.6319,
-      "volume": 244091.27949999995,
+      "price": 0.00964724,
+      "change_24h_pct": 0.4732,
+      "volume": 244046.47729999994,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "BLESSUSD"
@@ -1240,8 +1240,8 @@
     {
       "symbol": "JUP",
       "name": "Jupiter Perpetual",
-      "price": 0.33678914,
-      "change_24h_pct": 10.4181,
+      "price": 0.33705879,
+      "change_24h_pct": 9.8923,
       "volume": 240321.061,
       "market_cap": null,
       "chart_symbol": null,
@@ -1250,9 +1250,9 @@
     {
       "symbol": "EVAA",
       "name": "EVAA Protocol Perpetual",
-      "price": 0.72918159,
-      "change_24h_pct": 1.3959,
-      "volume": 238887.60489999992,
+      "price": 0.73058547,
+      "change_24h_pct": 1.5513,
+      "volume": 238572.0566999999,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "EVAAUSD"
@@ -1260,8 +1260,8 @@
     {
       "symbol": "TST",
       "name": "Test Perpetual",
-      "price": 0.01924311,
-      "change_24h_pct": 0.9384,
+      "price": 0.0193177,
+      "change_24h_pct": 1.6968,
       "volume": 227887.924,
       "market_cap": null,
       "chart_symbol": null,
@@ -1270,9 +1270,9 @@
     {
       "symbol": "TRX",
       "name": "TRON Perpetual",
-      "price": 0.33759188,
-      "change_24h_pct": -0.7503,
-      "volume": 223882.29927000002,
+      "price": 0.33753567,
+      "change_24h_pct": -0.7219,
+      "volume": 223931.23054,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "TRXUSD"
@@ -1280,9 +1280,9 @@
     {
       "symbol": "ETC",
       "name": "Ethereum Classic Perpetual",
-      "price": 9.47272548,
-      "change_24h_pct": 0.8357,
-      "volume": 208827.57609999986,
+      "price": 9.50052371,
+      "change_24h_pct": 0.9262,
+      "volume": 208822.95409999986,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "ETCUSD"
@@ -1290,9 +1290,9 @@
     {
       "symbol": "FARTCOIN",
       "name": "Fartcoin Perpetual",
-      "price": 0.19500842,
-      "change_24h_pct": 4.949,
-      "volume": 194162.50780000008,
+      "price": 0.19493665,
+      "change_24h_pct": 4.7876,
+      "volume": 194149.30890000012,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "FARTCOINUSD"
@@ -1300,9 +1300,9 @@
     {
       "symbol": "VELVET",
       "name": "Velvet Perpetual",
-      "price": 0.06014913,
-      "change_24h_pct": -1.6597,
-      "volume": 193678.28100000002,
+      "price": 0.06015693,
+      "change_24h_pct": -1.8093,
+      "volume": 193516.449,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "VELVETUSD"
@@ -1310,8 +1310,8 @@
     {
       "symbol": "ALLO",
       "name": "Allora Perpetual",
-      "price": 0.28949598,
-      "change_24h_pct": 1.0162,
+      "price": 0.28969147,
+      "change_24h_pct": 0.6699,
       "volume": 173258.58999999997,
       "market_cap": null,
       "chart_symbol": null,
@@ -1320,8 +1320,8 @@
     {
       "symbol": "AXS",
       "name": "Axie Infinity Perpetual",
-      "price": 1.21910398,
-      "change_24h_pct": 12.3795,
+      "price": 1.22120087,
+      "change_24h_pct": 12.4448,
       "volume": 165139.68999999994,
       "market_cap": null,
       "chart_symbol": null,
@@ -1330,8 +1330,8 @@
     {
       "symbol": "PENGU",
       "name": "Pudgy Penguins Perpetual",
-      "price": 0.01034164,
-      "change_24h_pct": 6.7064,
+      "price": 0.01036387,
+      "change_24h_pct": 6.3825,
       "volume": 152732.95359999995,
       "market_cap": null,
       "chart_symbol": null,
@@ -1340,9 +1340,9 @@
     {
       "symbol": "1000PEPE",
       "name": "1000PEPE Perpetual",
-      "price": 0.00446747,
-      "change_24h_pct": 0.6015,
-      "volume": 150460.31580000007,
+      "price": 0.00447379,
+      "change_24h_pct": 0.3534,
+      "volume": 150549.76980000007,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "1000PEPEUSD"
@@ -1350,9 +1350,9 @@
     {
       "symbol": "SKYAI",
       "name": "SkyAI Perpetual",
-      "price": 0.04550675,
-      "change_24h_pct": -1.2519,
-      "volume": 143271.90219999995,
+      "price": 0.045533,
+      "change_24h_pct": -1.3028,
+      "volume": 142345.87069999997,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "SKYAIUSD"
@@ -1360,8 +1360,8 @@
     {
       "symbol": "FF",
       "name": "Falcon Finance Perpetual",
-      "price": 0.1333635,
-      "change_24h_pct": -1.5772,
+      "price": 0.13366528,
+      "change_24h_pct": -1.2267,
       "volume": 142107.42000000004,
       "market_cap": null,
       "chart_symbol": null,
@@ -1370,8 +1370,8 @@
     {
       "symbol": "AR",
       "name": "Arweave Perpetual",
-      "price": 4.65475078,
-      "change_24h_pct": 3.2494,
+      "price": 4.64203652,
+      "change_24h_pct": 2.7887,
       "volume": 135732.10099999994,
       "market_cap": null,
       "chart_symbol": null,
@@ -1380,9 +1380,9 @@
     {
       "symbol": "ETHFI",
       "name": "Ether.fi Perpetual",
-      "price": 0.70763937,
-      "change_24h_pct": 4.6915,
-      "volume": 133993.73619999998,
+      "price": 0.70934445,
+      "change_24h_pct": 4.6988,
+      "volume": 133980.20620000002,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "ETHFIUSD"
@@ -1390,9 +1390,9 @@
     {
       "symbol": "BILL",
       "name": "Billions Network Perpetual",
-      "price": 0.01323052,
-      "change_24h_pct": -2.7611,
-      "volume": 133463.69499999995,
+      "price": 0.01325419,
+      "change_24h_pct": -2.505,
+      "volume": 133934.75699999993,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "BILLUSD"
@@ -1400,9 +1400,9 @@
     {
       "symbol": "B",
       "name": "BUILDon Perpetual",
-      "price": 0.19948173,
-      "change_24h_pct": -4.3829,
-      "volume": 129329.76999999993,
+      "price": 0.19989997,
+      "change_24h_pct": -4.2894,
+      "volume": 129389.61999999994,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "BUSD"
@@ -1410,8 +1410,8 @@
     {
       "symbol": "CROSS",
       "name": "Cross Perpetual",
-      "price": 0.14676499,
-      "change_24h_pct": -3.721,
+      "price": 0.14679318,
+      "change_24h_pct": -3.6233,
       "volume": 121428.35120000003,
       "market_cap": null,
       "chart_symbol": null,
@@ -1420,38 +1420,38 @@
     {
       "symbol": "ARC",
       "name": "AI Rig Complex Perpetual",
-      "price": 0.07147772,
-      "change_24h_pct": -2.2014,
+      "price": 0.07175432,
+      "change_24h_pct": -1.629,
       "volume": 116429.0252,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "ARCUSD"
     },
     {
-      "symbol": "RED",
-      "name": "RedStone Perpetual",
-      "price": 0.17388674,
-      "change_24h_pct": 7.4683,
-      "volume": 115200.506,
-      "market_cap": null,
-      "chart_symbol": null,
-      "delta_symbol": "REDUSD"
-    },
-    {
       "symbol": "WLD",
       "name": "Worldcoin Perpetual",
-      "price": 0.4979548,
-      "change_24h_pct": 13.7792,
-      "volume": 114599.2127,
+      "price": 0.4965134,
+      "change_24h_pct": 13.0163,
+      "volume": 115759.7057,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "WLDUSD"
     },
     {
+      "symbol": "RED",
+      "name": "RedStone Perpetual",
+      "price": 0.17341541,
+      "change_24h_pct": 7.7922,
+      "volume": 115209.196,
+      "market_cap": null,
+      "chart_symbol": null,
+      "delta_symbol": "REDUSD"
+    },
+    {
       "symbol": "XAN",
       "name": "Anoma Perpetual",
-      "price": 0.01206582,
-      "change_24h_pct": -2.3284,
+      "price": 0.01214057,
+      "change_24h_pct": -1.9329,
       "volume": 113505.08990000004,
       "market_cap": null,
       "chart_symbol": null,
@@ -1460,8 +1460,8 @@
     {
       "symbol": "PENDLE",
       "name": "Pendle Perpetual",
-      "price": 2.51548026,
-      "change_24h_pct": -3.0153,
+      "price": 2.51813505,
+      "change_24h_pct": -3.1258,
       "volume": 112726.5541,
       "market_cap": null,
       "chart_symbol": null,
@@ -1470,8 +1470,8 @@
     {
       "symbol": "APT",
       "name": "Aptos Perpetual",
-      "price": 0.86413705,
-      "change_24h_pct": 7.1279,
+      "price": 0.86409855,
+      "change_24h_pct": 6.8614,
       "volume": 111913.80829999999,
       "market_cap": null,
       "chart_symbol": null,
@@ -1480,8 +1480,8 @@
     {
       "symbol": "WIF",
       "name": "Dogwifhat Perpetual",
-      "price": 0.25114931,
-      "change_24h_pct": 6.0349,
+      "price": 0.25153559,
+      "change_24h_pct": 5.6797,
       "volume": 107090.22430000005,
       "market_cap": null,
       "chart_symbol": null,
@@ -1490,9 +1490,9 @@
     {
       "symbol": "TIA",
       "name": "Celestia Perpetual",
-      "price": 0.49184047,
-      "change_24h_pct": 0.5507,
-      "volume": 106766.51650000003,
+      "price": 0.49203759,
+      "change_24h_pct": 0.4219,
+      "volume": 106766.02790000002,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "TIAUSD"
@@ -1500,68 +1500,68 @@
     {
       "symbol": "BIO",
       "name": "Bio Protocol Perpetual",
-      "price": 0.0328139,
-      "change_24h_pct": 6.965,
+      "price": 0.0328971,
+      "change_24h_pct": 7.2748,
       "volume": 98562.03689999998,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "BIOUSD"
     },
     {
-      "symbol": "PUMP",
-      "name": "Pump.fun Perpetual",
-      "price": 0.00417288,
-      "change_24h_pct": 7.7793,
-      "volume": 97647.16599999997,
+      "symbol": "OP",
+      "name": "Optimism Perpetual",
+      "price": 0.14581279,
+      "change_24h_pct": 11.3032,
+      "volume": 97615.44722999999,
       "market_cap": null,
       "chart_symbol": null,
-      "delta_symbol": "PUMPUSD"
+      "delta_symbol": "OPUSD"
     },
     {
       "symbol": "IOTA",
       "name": "IOTA Perpetual",
-      "price": 0.05025024,
-      "change_24h_pct": 3.7143,
+      "price": 0.05028873,
+      "change_24h_pct": 3.8542,
       "volume": 97230.02370000002,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "IOTAUSD"
     },
     {
-      "symbol": "OP",
-      "name": "Optimism Perpetual",
-      "price": 0.14541139,
-      "change_24h_pct": 10.979,
-      "volume": 96861.68656999999,
+      "symbol": "PUMP",
+      "name": "Pump.fun Perpetual",
+      "price": 0.00417951,
+      "change_24h_pct": 7.9395,
+      "volume": 97143.41599999997,
       "market_cap": null,
       "chart_symbol": null,
-      "delta_symbol": "OPUSD"
+      "delta_symbol": "PUMPUSD"
+    },
+    {
+      "symbol": "KITE",
+      "name": "Kite Perpetual",
+      "price": 0.13418885,
+      "change_24h_pct": 3.8055,
+      "volume": 95637.953,
+      "market_cap": null,
+      "chart_symbol": null,
+      "delta_symbol": "KITEUSD"
     },
     {
       "symbol": "1000BONK",
       "name": "1000BONK Perpetual",
-      "price": 0.00371402,
-      "change_24h_pct": -1.9846,
+      "price": 0.00371472,
+      "change_24h_pct": -1.8898,
       "volume": 95508.44899999998,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "1000BONKUSD"
     },
     {
-      "symbol": "KITE",
-      "name": "Kite Perpetual",
-      "price": 0.13403657,
-      "change_24h_pct": 3.0886,
-      "volume": 95503.891,
-      "market_cap": null,
-      "chart_symbol": null,
-      "delta_symbol": "KITEUSD"
-    },
-    {
       "symbol": "PI",
       "name": "Pi Network Perpetual",
-      "price": 0.091012,
-      "change_24h_pct": 4.5673,
+      "price": 0.09077064,
+      "change_24h_pct": 3.8007,
       "volume": 92408.574,
       "market_cap": null,
       "chart_symbol": null,
@@ -1570,8 +1570,8 @@
     {
       "symbol": "ASTER",
       "name": "Aster Perpetual",
-      "price": 0.73314087,
-      "change_24h_pct": 3.5431,
+      "price": 0.73523608,
+      "change_24h_pct": 3.8681,
       "volume": 91936.601,
       "market_cap": null,
       "chart_symbol": null,
@@ -1580,8 +1580,8 @@
     {
       "symbol": "ZEN",
       "name": "Horizen Perpetual",
-      "price": 7.65181556,
-      "change_24h_pct": 3.6443,
+      "price": 7.67943713,
+      "change_24h_pct": 3.8217,
       "volume": 84288.944,
       "market_cap": null,
       "chart_symbol": null,
@@ -1590,9 +1590,9 @@
     {
       "symbol": "INIT",
       "name": "Initia Perpetual",
-      "price": 0.09873472,
-      "change_24h_pct": -0.6165,
-      "volume": 74350.82229999997,
+      "price": 0.09896351,
+      "change_24h_pct": -0.4353,
+      "volume": 72911.12829999997,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "INITUSD"
@@ -1600,9 +1600,9 @@
     {
       "symbol": "PIEVERSE",
       "name": "Pieverse Perpetual",
-      "price": 1.60789682,
-      "change_24h_pct": -0.5839,
-      "volume": 72177.18499999998,
+      "price": 1.60489776,
+      "change_24h_pct": -0.6739,
+      "volume": 72096.38999999998,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "PIEVERSEUSD"
@@ -1610,8 +1610,8 @@
     {
       "symbol": "BASED",
       "name": "Based Perpetual",
-      "price": 0.06861823,
-      "change_24h_pct": 2.7109,
+      "price": 0.06867474,
+      "change_24h_pct": 2.7855,
       "volume": 70971.90200000002,
       "market_cap": null,
       "chart_symbol": null,
@@ -1620,8 +1620,8 @@
     {
       "symbol": "VIRTUAL",
       "name": "Virtuals Protocol Perpetual",
-      "price": 0.79487171,
-      "change_24h_pct": 7.0041,
+      "price": 0.79342477,
+      "change_24h_pct": 6.6641,
       "volume": 69008.12949999998,
       "market_cap": null,
       "chart_symbol": null,
@@ -1630,8 +1630,8 @@
     {
       "symbol": "EIGEN",
       "name": "Eigenlayer Perpetual",
-      "price": 0.2601863,
-      "change_24h_pct": 9.4965,
+      "price": 0.26072172,
+      "change_24h_pct": 9.4288,
       "volume": 68731.08490000002,
       "market_cap": null,
       "chart_symbol": null,
@@ -1640,8 +1640,8 @@
     {
       "symbol": "AIGENSYN",
       "name": "Gensyn Perpetual",
-      "price": 0.02155079,
-      "change_24h_pct": 5.2871,
+      "price": 0.0218376,
+      "change_24h_pct": 6.8026,
       "volume": 66839.394,
       "market_cap": null,
       "chart_symbol": null,
@@ -1650,9 +1650,9 @@
     {
       "symbol": "TRUMP",
       "name": "Official Trump Perpetual",
-      "price": 2.11217224,
-      "change_24h_pct": 0.9231,
-      "volume": 65786.4826,
+      "price": 2.11851793,
+      "change_24h_pct": 0.9652,
+      "volume": 65719.41500000001,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "TRUMPUSD"
@@ -1660,8 +1660,8 @@
     {
       "symbol": "HBAR",
       "name": "Hedera Perpetual",
-      "price": 0.09469676,
-      "change_24h_pct": 1.3572,
+      "price": 0.09486582,
+      "change_24h_pct": 1.5534,
       "volume": 61092.92731000001,
       "market_cap": null,
       "chart_symbol": null,
@@ -1670,9 +1670,9 @@
     {
       "symbol": "KAITO",
       "name": "KAITO Perpetual",
-      "price": 0.35533332,
-      "change_24h_pct": 1.448,
-      "volume": 60387.60849999996,
+      "price": 0.35567852,
+      "change_24h_pct": 1.3085,
+      "volume": 60374.99949999996,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "KAITOUSD"
@@ -1680,8 +1680,8 @@
     {
       "symbol": "MOODENG",
       "name": "Moo Deng Perpetual",
-      "price": 0.05010685,
-      "change_24h_pct": 2.0461,
+      "price": 0.05013357,
+      "change_24h_pct": 2.0332,
       "volume": 55359.0466,
       "market_cap": null,
       "chart_symbol": null,
@@ -1690,8 +1690,8 @@
     {
       "symbol": "GRIFFAIN",
       "name": "GRIFFAIN Perpetual",
-      "price": 0.0155398,
-      "change_24h_pct": 2.2404,
+      "price": 0.01551531,
+      "change_24h_pct": 2.3967,
       "volume": 55094.22715,
       "market_cap": null,
       "chart_symbol": null,
@@ -1700,8 +1700,8 @@
     {
       "symbol": "GALA",
       "name": "GALA Perpetual",
-      "price": 0.00216115,
-      "change_24h_pct": 8.0348,
+      "price": 0.00217024,
+      "change_24h_pct": 8.3499,
       "volume": 54697.1274,
       "market_cap": null,
       "chart_symbol": null,
@@ -1710,8 +1710,8 @@
     {
       "symbol": "AIO",
       "name": "OlaXBT Perpetual",
-      "price": 0.03802009,
-      "change_24h_pct": -2.2525,
+      "price": 0.03802265,
+      "change_24h_pct": -2.1775,
       "volume": 53772.75199999999,
       "market_cap": null,
       "chart_symbol": null,
@@ -1720,9 +1720,9 @@
     {
       "symbol": "BB",
       "name": "BounceBit Perpetual",
-      "price": 0.01037941,
-      "change_24h_pct": -1.8791,
-      "volume": 53668.61339999999,
+      "price": 0.01039598,
+      "change_24h_pct": -1.4007,
+      "volume": 53707.15949999999,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "BBUSD"
@@ -1730,8 +1730,8 @@
     {
       "symbol": "1000SHIB",
       "name": "1000SHIB Perpetual",
-      "price": 0.00593316,
-      "change_24h_pct": 2.3707,
+      "price": 0.00594706,
+      "change_24h_pct": 2.4908,
       "volume": 51077.754,
       "market_cap": null,
       "chart_symbol": null,
@@ -1740,9 +1740,9 @@
     {
       "symbol": "ARIA",
       "name": "Aria.AI Perpetual",
-      "price": 0.03662002,
-      "change_24h_pct": 3.4701,
-      "volume": 50384.609500000006,
+      "price": 0.03678481,
+      "change_24h_pct": 3.8071,
+      "volume": 50313.82950000001,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "ARIAUSD"
@@ -1750,8 +1750,8 @@
     {
       "symbol": "SIREN",
       "name": "Siren Perpetual",
-      "price": 0.02363091,
-      "change_24h_pct": 0.2008,
+      "price": 0.02360696,
+      "change_24h_pct": 0.1473,
       "volume": 49680.495800000004,
       "market_cap": null,
       "chart_symbol": null,
@@ -1760,8 +1760,8 @@
     {
       "symbol": "BANK",
       "name": "Lorenzo Protocol Perpetual",
-      "price": 0.03484169,
-      "change_24h_pct": 1.165,
+      "price": 0.03488649,
+      "change_24h_pct": 1.3054,
       "volume": 49487.842000000004,
       "market_cap": null,
       "chart_symbol": null,
@@ -1770,8 +1770,8 @@
     {
       "symbol": "SPX",
       "name": "SPX6900 Perpetual",
-      "price": 0.45944189,
-      "change_24h_pct": 5.6426,
+      "price": 0.45903673,
+      "change_24h_pct": 5.2022,
       "volume": 47613.37899999999,
       "market_cap": null,
       "chart_symbol": null,
@@ -1780,9 +1780,9 @@
     {
       "symbol": "TAC",
       "name": "TAC Perpetual",
-      "price": 0.0015794,
-      "change_24h_pct": 2.0819,
-      "volume": 47324.534499999994,
+      "price": 0.00158394,
+      "change_24h_pct": 2.1231,
+      "volume": 47324.07019999999,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "TACUSD"
@@ -1790,8 +1790,8 @@
     {
       "symbol": "GIGGLE",
       "name": "Giggle Fund Perpetual",
-      "price": 40.67859175,
-      "change_24h_pct": -0.2735,
+      "price": 40.71897536,
+      "change_24h_pct": 0.0448,
       "volume": 46181.039000000004,
       "market_cap": null,
       "chart_symbol": null,
@@ -1800,9 +1800,9 @@
     {
       "symbol": "ZK",
       "name": "ZKsync Perpetual",
-      "price": 0.01281437,
-      "change_24h_pct": 6.8096,
-      "volume": 46046.221699999995,
+      "price": 0.01283494,
+      "change_24h_pct": 7.0391,
+      "volume": 46047.7625,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "ZKUSD"
@@ -1810,9 +1810,9 @@
     {
       "symbol": "ESPORTS",
       "name": "Yooldo Games Perpetual",
-      "price": 0.01066656,
-      "change_24h_pct": -0.3714,
-      "volume": 44443.341000000015,
+      "price": 0.01066877,
+      "change_24h_pct": -0.3788,
+      "volume": 43640.091000000015,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "ESPORTSUSD"
@@ -1820,9 +1820,9 @@
     {
       "symbol": "SOPH",
       "name": "Sophon Perpetual",
-      "price": 0.00380327,
-      "change_24h_pct": -0.9408,
-      "volume": 37221.6957,
+      "price": 0.00380775,
+      "change_24h_pct": -1.14,
+      "volume": 37259.78569999999,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "SOPHUSD"
@@ -1830,8 +1830,8 @@
     {
       "symbol": "GRAM",
       "name": "GRAM Perpetual",
-      "price": 1.44932596,
-      "change_24h_pct": 3.0543,
+      "price": 1.45142871,
+      "change_24h_pct": 3.2819,
       "volume": 36783.369999999995,
       "market_cap": null,
       "chart_symbol": null,
@@ -1840,8 +1840,8 @@
     {
       "symbol": "TLM",
       "name": "Alien Worlds Perpetual",
-      "price": 0.00157729,
-      "change_24h_pct": 5.2593,
+      "price": 0.00157991,
+      "change_24h_pct": 5.5462,
       "volume": 35697.729999999996,
       "market_cap": null,
       "chart_symbol": null,
@@ -1850,8 +1850,8 @@
     {
       "symbol": "LIGHT",
       "name": "Bitlight Perpetual",
-      "price": 0.17778802,
-      "change_24h_pct": -3.5146,
+      "price": 0.17794058,
+      "change_24h_pct": -3.2392,
       "volume": 35214.02500000001,
       "market_cap": null,
       "chart_symbol": null,
@@ -1860,8 +1860,8 @@
     {
       "symbol": "IN",
       "name": "INFINIT Perpetual",
-      "price": 0.03697103,
-      "change_24h_pct": 1.5038,
+      "price": 0.03700712,
+      "change_24h_pct": 1.6004,
       "volume": 33979.30599999999,
       "market_cap": null,
       "chart_symbol": null,
@@ -1870,19 +1870,29 @@
     {
       "symbol": "ORDER",
       "name": "Orderly Perpetual",
-      "price": 0.04150543,
-      "change_24h_pct": 2.1779,
+      "price": 0.04153896,
+      "change_24h_pct": 2.3146,
       "volume": 33363.99669999998,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "ORDERUSD"
     },
     {
+      "symbol": "PIPPIN",
+      "name": "pippin Perpetual",
+      "price": 0.01929856,
+      "change_24h_pct": 1.3296,
+      "volume": 33170.53700000001,
+      "market_cap": null,
+      "chart_symbol": null,
+      "delta_symbol": "PIPPINUSD"
+    },
+    {
       "symbol": "EDEN",
       "name": "OpenEden Perpetual",
-      "price": 0.06272009,
-      "change_24h_pct": -0.6932,
-      "volume": 32791.19469999999,
+      "price": 0.06276833,
+      "change_24h_pct": -0.1243,
+      "volume": 32854.551999999996,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "EDENUSD"
@@ -1890,28 +1900,18 @@
     {
       "symbol": "RAVE",
       "name": "RaveDAO Perpetual",
-      "price": 0.20159668,
-      "change_24h_pct": -0.411,
+      "price": 0.20182431,
+      "change_24h_pct": -0.2474,
       "volume": 32707.463500000013,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "RAVEUSD"
     },
     {
-      "symbol": "PIPPIN",
-      "name": "pippin Perpetual",
-      "price": 0.01926917,
-      "change_24h_pct": 1.3201,
-      "volume": 32593.03700000001,
-      "market_cap": null,
-      "chart_symbol": null,
-      "delta_symbol": "PIPPINUSD"
-    },
-    {
       "symbol": "AVAAI",
       "name": "AVA AI Perpetual",
-      "price": 0.00974659,
-      "change_24h_pct": -0.7578,
+      "price": 0.00972974,
+      "change_24h_pct": -0.8118,
       "volume": 31491.428100000012,
       "market_cap": null,
       "chart_symbol": null,
@@ -1920,8 +1920,8 @@
     {
       "symbol": "COAI",
       "name": "ChainOpera AI Perpetual",
-      "price": 0.32265977,
-      "change_24h_pct": -0.0008,
+      "price": 0.32263356,
+      "change_24h_pct": -0.0428,
       "volume": 29599.003000000004,
       "market_cap": null,
       "chart_symbol": null,
@@ -1930,9 +1930,9 @@
     {
       "symbol": "NOT",
       "name": "Notcoin Perpetual",
-      "price": 0.00049185,
-      "change_24h_pct": 1.6975,
-      "volume": 28826.515980000004,
+      "price": 0.00049196,
+      "change_24h_pct": 1.931,
+      "volume": 24973.918680000002,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "NOTUSD"
@@ -1940,9 +1940,9 @@
     {
       "symbol": "KSM",
       "name": "Kusama Perpetual",
-      "price": 4.72630904,
-      "change_24h_pct": 3.0729,
-      "volume": 24843.120799999997,
+      "price": 4.73285074,
+      "change_24h_pct": 3.1724,
+      "volume": 24826.611199999996,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "KSMUSD"
@@ -1950,8 +1950,8 @@
     {
       "symbol": "DUSK",
       "name": "DUSK Perpetual",
-      "price": 0.09050877,
-      "change_24h_pct": 3.8841,
+      "price": 0.0904956,
+      "change_24h_pct": 3.7927,
       "volume": 23291.95,
       "market_cap": null,
       "chart_symbol": null,
@@ -1960,8 +1960,8 @@
     {
       "symbol": "BERA",
       "name": "Berachain Perpetual",
-      "price": 0.23289964,
-      "change_24h_pct": 2.4942,
+      "price": 0.23349839,
+      "change_24h_pct": 2.873,
       "volume": 21973.390399999997,
       "market_cap": null,
       "chart_symbol": null,
@@ -1970,9 +1970,9 @@
     {
       "symbol": "NEIRO",
       "name": "Neiro Perpetual",
-      "price": 9.447e-05,
-      "change_24h_pct": 4.2945,
-      "volume": 21901.482679999997,
+      "price": 9.466e-05,
+      "change_24h_pct": 4.3895,
+      "volume": 21905.734279999997,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "NEIROUSD"
@@ -1980,9 +1980,9 @@
     {
       "symbol": "HANA",
       "name": "HANA Network Perpetual",
-      "price": 0.01449172,
-      "change_24h_pct": -3.8183,
-      "volume": 20442.720999999998,
+      "price": 0.01451231,
+      "change_24h_pct": -3.5344,
+      "volume": 21084.627999999997,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "HANAUSD"
@@ -1990,8 +1990,8 @@
     {
       "symbol": "RUNE",
       "name": "THORChain Perpetual",
-      "price": 0.65109236,
-      "change_24h_pct": 1.9483,
+      "price": 0.65064185,
+      "change_24h_pct": 1.901,
       "volume": 19717.285400000004,
       "market_cap": null,
       "chart_symbol": null,
@@ -2000,8 +2000,8 @@
     {
       "symbol": "PEOPLE",
       "name": "ConstitutionDAO Perpetual",
-      "price": 0.00948954,
-      "change_24h_pct": 2.4506,
+      "price": 0.0094846,
+      "change_24h_pct": 2.2962,
       "volume": 19087.379,
       "market_cap": null,
       "chart_symbol": null,
@@ -2010,9 +2010,9 @@
     {
       "symbol": "POPCAT",
       "name": "Popcat Perpetual",
-      "price": 0.05945355,
-      "change_24h_pct": 4.8372,
-      "volume": 18081.17493,
+      "price": 0.05977911,
+      "change_24h_pct": 5.3232,
+      "volume": 18033.977150000002,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "POPCATUSD"
@@ -2020,8 +2020,8 @@
     {
       "symbol": "TOWNS",
       "name": "Towns Perpetual",
-      "price": 0.00215617,
-      "change_24h_pct": 3.7134,
+      "price": 0.00215852,
+      "change_24h_pct": 3.8864,
       "volume": 17846.829399999995,
       "market_cap": null,
       "chart_symbol": null,
@@ -2030,8 +2030,8 @@
     {
       "symbol": "ZORA",
       "name": "Zora Perpetual",
-      "price": 0.00895751,
-      "change_24h_pct": 1.176,
+      "price": 0.00895014,
+      "change_24h_pct": 1.0826,
       "volume": 17304.8931,
       "market_cap": null,
       "chart_symbol": null,
@@ -2040,8 +2040,8 @@
     {
       "symbol": "MOVE",
       "name": "Movement Perpetual",
-      "price": 0.00976449,
-      "change_24h_pct": 5.3951,
+      "price": 0.00975041,
+      "change_24h_pct": 5.2277,
       "volume": 16474.744400000003,
       "market_cap": null,
       "chart_symbol": null,
@@ -2050,8 +2050,8 @@
     {
       "symbol": "JASMY",
       "name": "JasmyCoin Perpetual",
-      "price": 0.00470746,
-      "change_24h_pct": 6.7473,
+      "price": 0.00471753,
+      "change_24h_pct": 6.8567,
       "volume": 15483.775100000003,
       "market_cap": null,
       "chart_symbol": null,
@@ -2060,8 +2060,8 @@
     {
       "symbol": "ENJ",
       "name": "Enjin Coin Perpetual",
-      "price": 0.02962565,
-      "change_24h_pct": 5.6387,
+      "price": 0.02965823,
+      "change_24h_pct": 5.6888,
       "volume": 15148.297999999995,
       "market_cap": null,
       "chart_symbol": null,
@@ -2070,8 +2070,8 @@
     {
       "symbol": "MON",
       "name": "Monad Perpetual",
-      "price": 0.02632266,
-      "change_24h_pct": 4.7396,
+      "price": 0.02634623,
+      "change_24h_pct": 4.7124,
       "volume": 14862.949000000004,
       "market_cap": null,
       "chart_symbol": null,
@@ -2080,8 +2080,8 @@
     {
       "symbol": "STX",
       "name": "Stacks Perpetual",
-      "price": 0.32757939,
-      "change_24h_pct": 3.9819,
+      "price": 0.32773928,
+      "change_24h_pct": 3.8346,
       "volume": 14235.5402,
       "market_cap": null,
       "chart_symbol": null,
@@ -2090,8 +2090,8 @@
     {
       "symbol": "SOLV",
       "name": "Solv Protocol Perpetual",
-      "price": 0.0041964,
-      "change_24h_pct": 1.1013,
+      "price": 0.00419842,
+      "change_24h_pct": 1.29,
       "volume": 14209.178000000004,
       "market_cap": null,
       "chart_symbol": null,
@@ -2100,8 +2100,8 @@
     {
       "symbol": "GOAT",
       "name": "Goatseus Maximus Perpetual",
-      "price": 0.01951073,
-      "change_24h_pct": 1.8396,
+      "price": 0.01950511,
+      "change_24h_pct": 2.1774,
       "volume": 13984.709600000002,
       "market_cap": null,
       "chart_symbol": null,
@@ -2110,8 +2110,8 @@
     {
       "symbol": "MELANIA",
       "name": "Melania Meme Perpetual",
-      "price": 0.10757191,
-      "change_24h_pct": 0.2876,
+      "price": 0.10789159,
+      "change_24h_pct": 0.627,
       "volume": 13812.1597,
       "market_cap": null,
       "chart_symbol": null,
@@ -2120,9 +2120,9 @@
     {
       "symbol": "MANA",
       "name": "Decentraland Perpetual",
-      "price": 0.09207141,
-      "change_24h_pct": 4.1559,
-      "volume": 13333.496700000003,
+      "price": 0.09228482,
+      "change_24h_pct": 4.5471,
+      "volume": 13333.588900000002,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "MANAUSD"
@@ -2130,9 +2130,9 @@
     {
       "symbol": "STRK",
       "name": "Starknet Perpetual",
-      "price": 0.04080049,
-      "change_24h_pct": 4.1064,
-      "volume": 12370.135000000002,
+      "price": 0.04083713,
+      "change_24h_pct": 3.951,
+      "volume": 12056.535000000002,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "STRKUSD"
@@ -2140,8 +2140,8 @@
     {
       "symbol": "AIOT",
       "name": "OKZOO Perpetual",
-      "price": 0.05219256,
-      "change_24h_pct": 3.0076,
+      "price": 0.05225105,
+      "change_24h_pct": 3.1522,
       "volume": 11390.383999999998,
       "market_cap": null,
       "chart_symbol": null,
@@ -2150,8 +2150,8 @@
     {
       "symbol": "HIVE",
       "name": "Hive Perpetual",
-      "price": 0.05876431,
-      "change_24h_pct": 2.9666,
+      "price": 0.05898081,
+      "change_24h_pct": 3.2169,
       "volume": 11368.628199999997,
       "market_cap": null,
       "chart_symbol": null,
@@ -2160,9 +2160,9 @@
     {
       "symbol": "PROVE",
       "name": "Succinct Perpetual",
-      "price": 0.23692955,
-      "change_24h_pct": 1.8479,
-      "volume": 11286.183000000003,
+      "price": 0.23654467,
+      "change_24h_pct": 1.9381,
+      "volume": 11293.287000000002,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "PROVEUSD"
@@ -2170,8 +2170,8 @@
     {
       "symbol": "TRB",
       "name": "Tellor Tributes Perpetual",
-      "price": 20.15882176,
-      "change_24h_pct": -0.4892,
+      "price": 20.18324576,
+      "change_24h_pct": -0.4671,
       "volume": 11136.188299999998,
       "market_cap": null,
       "chart_symbol": null,
@@ -2180,8 +2180,8 @@
     {
       "symbol": "1000FLOKI",
       "name": "1000FLOKI Perpetual",
-      "price": 0.02857872,
-      "change_24h_pct": 0.1757,
+      "price": 0.02860532,
+      "change_24h_pct": 0.2193,
       "volume": 10730.887999999997,
       "market_cap": null,
       "chart_symbol": null,
@@ -2190,8 +2190,8 @@
     {
       "symbol": "SUSHI",
       "name": "Sushi Perpetual",
-      "price": 0.26517482,
-      "change_24h_pct": 3.5908,
+      "price": 0.26572577,
+      "change_24h_pct": 3.8161,
       "volume": 10477.595400000002,
       "market_cap": null,
       "chart_symbol": null,
@@ -2200,8 +2200,8 @@
     {
       "symbol": "IO",
       "name": "io.net Perpetual",
-      "price": 0.16605,
-      "change_24h_pct": 5.3617,
+      "price": 0.16619391,
+      "change_24h_pct": 5.2736,
       "volume": 10438.376600000001,
       "market_cap": null,
       "chart_symbol": null,
@@ -2210,8 +2210,8 @@
     {
       "symbol": "1MBABYDOGE",
       "name": "1MBABYDOGE Perpetual",
-      "price": 0.00042207,
-      "change_24h_pct": 1.1552,
+      "price": 0.00042238,
+      "change_24h_pct": 1.2222,
       "volume": 10308.513979999998,
       "market_cap": null,
       "chart_symbol": null,
@@ -2220,8 +2220,8 @@
     {
       "symbol": "PARTI",
       "name": "Particle Network Perpetual",
-      "price": 0.02682452,
-      "change_24h_pct": 3.7221,
+      "price": 0.02693532,
+      "change_24h_pct": 3.7603,
       "volume": 10097.473,
       "market_cap": null,
       "chart_symbol": null,
@@ -2230,8 +2230,8 @@
     {
       "symbol": "WLFI",
       "name": "World Liberty Financial Perpetual",
-      "price": 0.05722388,
-      "change_24h_pct": 1.1102,
+      "price": 0.05733283,
+      "change_24h_pct": 1.2217,
       "volume": 9509.184,
       "market_cap": null,
       "chart_symbol": null,
@@ -2240,8 +2240,8 @@
     {
       "symbol": "SONIC",
       "name": "Sonic SVM Perpetual",
-      "price": 0.02735388,
-      "change_24h_pct": -1.3675,
+      "price": 0.02728214,
+      "change_24h_pct": -1.613,
       "volume": 8951.232100000001,
       "market_cap": null,
       "chart_symbol": null,
@@ -2250,8 +2250,8 @@
     {
       "symbol": "COOKIE",
       "name": "Cookie DAO Perpetual",
-      "price": 0.01232569,
-      "change_24h_pct": 3.0219,
+      "price": 0.01232458,
+      "change_24h_pct": 2.8999,
       "volume": 8526.923710000005,
       "market_cap": null,
       "chart_symbol": null,
@@ -2260,8 +2260,8 @@
     {
       "symbol": "FRAX",
       "name": "FRAX Perpetual",
-      "price": 0.30336969,
-      "change_24h_pct": 0.3812,
+      "price": 0.30358581,
+      "change_24h_pct": 0.6218,
       "volume": 8501.367,
       "market_cap": null,
       "chart_symbol": null,
@@ -2270,8 +2270,8 @@
     {
       "symbol": "PNUT",
       "name": "Peanut the Squirrel Perpetual",
-      "price": 0.05687781,
-      "change_24h_pct": 4.576,
+      "price": 0.05691075,
+      "change_24h_pct": 4.6546,
       "volume": 8189.992400000001,
       "market_cap": null,
       "chart_symbol": null,
@@ -2280,8 +2280,8 @@
     {
       "symbol": "STBL",
       "name": "STBL Perpetual",
-      "price": 0.02840426,
-      "change_24h_pct": -0.1555,
+      "price": 0.02839577,
+      "change_24h_pct": -0.271,
       "volume": 7451.425299999999,
       "market_cap": null,
       "chart_symbol": null,
@@ -2290,8 +2290,8 @@
     {
       "symbol": "DOGS",
       "name": "Dogs Perpetual",
-      "price": 4.873e-05,
-      "change_24h_pct": 1.3519,
+      "price": 4.876e-05,
+      "change_24h_pct": 1.4143,
       "volume": 7282.48441,
       "market_cap": null,
       "chart_symbol": null,
@@ -2301,8 +2301,8 @@
       "symbol": "1000SATS",
       "name": "1000SATS Perpetual",
       "price": 1.224e-05,
-      "change_24h_pct": 2.8571,
-      "volume": 7181.000469999999,
+      "change_24h_pct": 2.9437,
+      "volume": 7224.400469999999,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "1000SATSUSD"
@@ -2310,9 +2310,9 @@
     {
       "symbol": "AIXBT",
       "name": "aixbt by Virtuals Perpetual",
-      "price": 0.02408041,
-      "change_24h_pct": 6.5785,
-      "volume": 7021.536199999999,
+      "price": 0.02409826,
+      "change_24h_pct": 6.701,
+      "volume": 7022.740199999998,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "AIXBTUSD"
@@ -2320,8 +2320,8 @@
     {
       "symbol": "MANTA",
       "name": "Manta Network Perpetual",
-      "price": 0.07138536,
-      "change_24h_pct": 2.1281,
+      "price": 0.07144566,
+      "change_24h_pct": 2.0979,
       "volume": 7006.1030599999995,
       "market_cap": null,
       "chart_symbol": null,
@@ -2330,9 +2330,9 @@
     {
       "symbol": "SIGN",
       "name": "Sign Perpetual",
-      "price": 0.01336309,
-      "change_24h_pct": 3.1745,
-      "volume": 6796.5686000000005,
+      "price": 0.01338539,
+      "change_24h_pct": 3.1709,
+      "volume": 6838.0032,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "SIGNUSD"
@@ -2340,8 +2340,8 @@
     {
       "symbol": "ME",
       "name": "Magic Eden Perpetual",
-      "price": 0.07796713,
-      "change_24h_pct": 1.4282,
+      "price": 0.07818813,
+      "change_24h_pct": 1.4638,
       "volume": 6478.0235,
       "market_cap": null,
       "chart_symbol": null,
@@ -2350,8 +2350,8 @@
     {
       "symbol": "MEME",
       "name": "Memecoin Perpetual",
-      "price": 0.0006451,
-      "change_24h_pct": 2.9426,
+      "price": 0.00064509,
+      "change_24h_pct": 2.9248,
       "volume": 6303.974270000001,
       "market_cap": null,
       "chart_symbol": null,
@@ -2360,9 +2360,9 @@
     {
       "symbol": "BLUR",
       "name": "Blur Perpetual",
-      "price": 0.02091619,
-      "change_24h_pct": 3.8395,
-      "volume": 6154.087399999999,
+      "price": 0.02093311,
+      "change_24h_pct": 3.8524,
+      "volume": 6154.924599999999,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "BLURUSD"
@@ -2370,8 +2370,8 @@
     {
       "symbol": "ORDI",
       "name": "ORDI Perpetual",
-      "price": 4.78943222,
-      "change_24h_pct": 4.3927,
+      "price": 4.78707108,
+      "change_24h_pct": 4.2122,
       "volume": 6015.9121,
       "market_cap": null,
       "chart_symbol": null,
@@ -2380,38 +2380,38 @@
     {
       "symbol": "API3",
       "name": "API3 Perpetual",
-      "price": 0.27989456,
-      "change_24h_pct": 3.8339,
+      "price": 0.28018607,
+      "change_24h_pct": 3.7253,
       "volume": 5785.18,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "API3USD"
     },
     {
-      "symbol": "BMT",
-      "name": "Bubblemaps Perpetual",
-      "price": 0.01992719,
-      "change_24h_pct": -1.7414,
-      "volume": 5076.744899999998,
-      "market_cap": null,
-      "chart_symbol": null,
-      "delta_symbol": "BMTUSD"
-    },
-    {
       "symbol": "SWARMS",
       "name": "Swarms Perpetual",
-      "price": 0.00853945,
-      "change_24h_pct": 2.256,
+      "price": 0.00855783,
+      "change_24h_pct": 2.5306,
       "volume": 5065.409680000001,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "SWARMSUSD"
     },
     {
+      "symbol": "BMT",
+      "name": "Bubblemaps Perpetual",
+      "price": 0.01995542,
+      "change_24h_pct": -1.6821,
+      "volume": 5052.312899999999,
+      "market_cap": null,
+      "chart_symbol": null,
+      "delta_symbol": "BMTUSD"
+    },
+    {
       "symbol": "LAYER",
       "name": "Solayer Perpetual",
-      "price": 0.08046327,
-      "change_24h_pct": 2.5428,
+      "price": 0.08041459,
+      "change_24h_pct": 2.5786,
       "volume": 4918.2717999999995,
       "market_cap": null,
       "chart_symbol": null,
@@ -2420,8 +2420,8 @@
     {
       "symbol": "LISTA",
       "name": "Lista DAO Perpetual",
-      "price": 0.08617759,
-      "change_24h_pct": 4.2944,
+      "price": 0.08637111,
+      "change_24h_pct": 4.9182,
       "volume": 4826.2316,
       "market_cap": null,
       "chart_symbol": null,
@@ -2430,8 +2430,8 @@
     {
       "symbol": "USUAL",
       "name": "Usual Perpetual",
-      "price": 0.01449661,
-      "change_24h_pct": 3.5472,
+      "price": 0.01450935,
+      "change_24h_pct": 3.5666,
       "volume": 4789.5685,
       "market_cap": null,
       "chart_symbol": null,
@@ -2440,9 +2440,9 @@
     {
       "symbol": "MMT",
       "name": "Momentum Perpetual",
-      "price": 0.17156501,
-      "change_24h_pct": 0.6746,
-      "volume": 4087.6849999999995,
+      "price": 0.17175163,
+      "change_24h_pct": 0.9428,
+      "volume": 4259.1849999999995,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "MMTUSD"
@@ -2450,8 +2450,8 @@
     {
       "symbol": "ALT",
       "name": "AltLayer Perpetual",
-      "price": 0.00805275,
-      "change_24h_pct": 4.1888,
+      "price": 0.00806674,
+      "change_24h_pct": 4.3023,
       "volume": 3457.5776000000005,
       "market_cap": null,
       "chart_symbol": null,
@@ -2460,8 +2460,8 @@
     {
       "symbol": "S",
       "name": "Sonic (ex-FTM) Perpetual",
-      "price": 0.04089586,
-      "change_24h_pct": 0.5679,
+      "price": 0.04091432,
+      "change_24h_pct": 0.5258,
       "volume": 3350.9698000000008,
       "market_cap": null,
       "chart_symbol": null,
@@ -2470,8 +2470,8 @@
     {
       "symbol": "SUN",
       "name": "Sun Token Perpetual",
-      "price": 0.01716953,
-      "change_24h_pct": -0.7811,
+      "price": 0.01717857,
+      "change_24h_pct": -0.569,
       "volume": 2847.9512999999997,
       "market_cap": null,
       "chart_symbol": null,
@@ -2480,8 +2480,8 @@
     {
       "symbol": "AUCTION",
       "name": "Bounce Perpetual",
-      "price": 3.86945582,
-      "change_24h_pct": 1.3879,
+      "price": 3.87292045,
+      "change_24h_pct": 1.3903,
       "volume": 2800.0494000000003,
       "market_cap": null,
       "chart_symbol": null,
@@ -2490,8 +2490,8 @@
     {
       "symbol": "VANA",
       "name": "Vana Perpetual",
-      "price": 1.15130818,
-      "change_24h_pct": 0.9639,
+      "price": 1.1508648,
+      "change_24h_pct": 0.8287,
       "volume": 2609.585100000001,
       "market_cap": null,
       "chart_symbol": null,
@@ -2500,8 +2500,8 @@
     {
       "symbol": "SAHARA",
       "name": "Sahara AI Perpetual",
-      "price": 0.00970565,
-      "change_24h_pct": 0.3661,
+      "price": 0.00970168,
+      "change_24h_pct": 0.3831,
       "volume": 2580.6220000000003,
       "market_cap": null,
       "chart_symbol": null,
@@ -2510,8 +2510,8 @@
     {
       "symbol": "SKL",
       "name": "SKALE Perpetual",
-      "price": 0.00459688,
-      "change_24h_pct": 0.2097,
+      "price": 0.00460272,
+      "change_24h_pct": 0.1279,
       "volume": 2456.099,
       "market_cap": null,
       "chart_symbol": null,
@@ -2520,8 +2520,8 @@
     {
       "symbol": "DYDX",
       "name": "dYdX Perpetual",
-      "price": 0.13437634,
-      "change_24h_pct": 1.0135,
+      "price": 0.13473465,
+      "change_24h_pct": 1.1646,
       "volume": 2450.3316999999997,
       "market_cap": null,
       "chart_symbol": null,
@@ -2530,8 +2530,8 @@
     {
       "symbol": "OPN",
       "name": "Opinion Perpetual",
-      "price": 0.05155197,
-      "change_24h_pct": 0.2855,
+      "price": 0.05164351,
+      "change_24h_pct": 0.4109,
       "volume": 2297.63,
       "market_cap": null,
       "chart_symbol": null,
@@ -2540,9 +2540,9 @@
     {
       "symbol": "ACT",
       "name": "Act I The AI Prophecy Perpetual",
-      "price": 0.01110499,
-      "change_24h_pct": 1.5807,
-      "volume": 1839.50027,
+      "price": 0.01111702,
+      "change_24h_pct": 1.7208,
+      "volume": 1847.7246300000002,
       "market_cap": null,
       "chart_symbol": null,
       "delta_symbol": "ACTUSD"
@@ -2550,8 +2550,8 @@
     {
       "symbol": "TNSR",
       "name": "Tensor Perpetual",
-      "price": 0.03871809,
-      "change_24h_pct": 1.1367,
+      "price": 0.03880589,
+      "change_24h_pct": 1.5875,
       "volume": 1798.283,
       "market_cap": null,
       "chart_symbol": null,
@@ -2560,8 +2560,8 @@
     {
       "symbol": "WCT",
       "name": "WalletConnect Token Perpetual",
-      "price": 0.04356962,
-      "change_24h_pct": 3.0017,
+      "price": 0.04361251,
+      "change_24h_pct": 3.0923,
       "volume": 1534.1333,
       "market_cap": null,
       "chart_symbol": null,
@@ -2570,8 +2570,8 @@
     {
       "symbol": "MASK",
       "name": "Mask Network Perpetual",
-      "price": 0.47085496,
-      "change_24h_pct": 1.123,
+      "price": 0.47042516,
+      "change_24h_pct": 0.9884,
       "volume": 807.0676999999998,
       "market_cap": null,
       "chart_symbol": null,
@@ -2580,8 +2580,8 @@
     {
       "symbol": "GLM",
       "name": "Golem Perpetual",
-      "price": 0.12876815,
-      "change_24h_pct": 1.6696,
+      "price": 0.12887482,
+      "change_24h_pct": 1.8429,
       "volume": 806.153,
       "market_cap": null,
       "chart_symbol": null,
@@ -2590,8 +2590,8 @@
     {
       "symbol": "RSR",
       "name": "Reserve Rights Perpetual",
-      "price": 0.0017983,
-      "change_24h_pct": 4.2674,
+      "price": 0.00179674,
+      "change_24h_pct": 4.0647,
       "volume": 758.1116,
       "market_cap": null,
       "chart_symbol": null,
@@ -2605,20 +2605,20 @@
       "score": 60,
       "reasons": [
         "Trend aligned: price > EMA20 > EMA50",
-        "RSI healthy for long (63.6)",
+        "RSI healthy for long (64.9)",
         "MACD histogram positive",
-        "Near resistance (1.1% away)",
+        "Near resistance (1.0% away)",
         "HTF 4h trend confirms bullish"
       ],
       "entry_zone": [
-        121.61,
-        121.98
+        121.76,
+        122.13
       ],
       "stop_loss": 117.62,
       "targets": [
         122.95,
-        129.59,
-        133.58
+        130.04,
+        134.18
       ],
       "risk_reward": "1:0.3",
       "timeframe": "1h",
@@ -2630,9 +2630,9 @@
       "score": 60,
       "reasons": [
         "Trend aligned: price > EMA20 > EMA50",
-        "RSI healthy for long (59.0)",
+        "RSI healthy for long (60.8)",
         "MACD histogram positive",
-        "Near resistance (1.4% away)",
+        "Near resistance (1.2% away)",
         "HTF 4h trend confirms bullish"
       ],
       "entry_zone": [
@@ -2642,6 +2642,30 @@
       "stop_loss": 0.1,
       "targets": null,
       "risk_reward": null,
+      "timeframe": "1h",
+      "invalidation": "Price closes back below EMA20 on 1h"
+    },
+    {
+      "symbol": "BTC",
+      "direction": "LONG",
+      "score": 55,
+      "reasons": [
+        "Trend aligned: price < EMA20 < EMA50",
+        "RSI healthy for long (45.6)",
+        "MACD histogram positive",
+        "Near support (1.3% away)"
+      ],
+      "entry_zone": [
+        83897.0,
+        84148.69
+      ],
+      "stop_loss": 82880.56,
+      "targets": [
+        85224.0,
+        85929.88,
+        86946.32
+      ],
+      "risk_reward": "1:1.3",
       "timeframe": "1h",
       "invalidation": "Price closes back below EMA20 on 1h"
     },
@@ -2669,31 +2693,14 @@
       "invalidation": "Price closes back below EMA20 on 1h"
     },
     {
-      "symbol": "BTC",
-      "direction": "NO_TRADE",
-      "score": 45,
-      "reasons": [
-        "Trend aligned: price < EMA20 < EMA50",
-        "RSI healthy for long (44.8)",
-        "MACD histogram negative",
-        "Near support (1.2% away)"
-      ],
-      "entry_zone": null,
-      "stop_loss": null,
-      "targets": null,
-      "risk_reward": null,
-      "timeframe": "1h",
-      "invalidation": null
-    },
-    {
       "symbol": "ETH",
       "direction": "NO_TRADE",
       "score": 45,
       "reasons": [
         "Trend aligned: price < EMA20 < EMA50",
-        "RSI healthy for long (47.9)",
+        "RSI healthy for long (49.4)",
         "MACD histogram negative",
-        "Near support (2.2% away)"
+        "Near support (2.3% away)"
       ],
       "entry_zone": null,
       "stop_loss": null,
@@ -2708,21 +2715,21 @@
       "score": 40,
       "reasons": [
         "Trend aligned: price > EMA20 > EMA50",
-        "RSI healthy for long (52.7)",
+        "RSI healthy for long (54.6)",
         "MACD histogram negative",
         "HTF 4h trend confirms bullish"
       ],
       "entry_zone": [
-        1.56,
+        1.57,
         1.57
       ],
       "stop_loss": 1.53,
       "targets": [
         1.63,
-        1.62,
-        1.65
+        1.65,
+        1.69
       ],
-      "risk_reward": "1:2.3",
+      "risk_reward": "1:1.5",
       "timeframe": "1h",
       "invalidation": "Price closes back below EMA20 on 1h"
     }
@@ -2733,20 +2740,20 @@
     "score": 60,
     "reasons": [
       "Trend aligned: price > EMA20 > EMA50",
-      "RSI healthy for long (63.6)",
+      "RSI healthy for long (64.9)",
       "MACD histogram positive",
-      "Near resistance (1.1% away)",
+      "Near resistance (1.0% away)",
       "HTF 4h trend confirms bullish"
     ],
     "entry_zone": [
-      121.61,
-      121.98
+      121.76,
+      122.13
     ],
     "stop_loss": 117.62,
     "targets": [
       122.95,
-      129.59,
-      133.58
+      130.04,
+      134.18
     ],
     "risk_reward": "1:0.3",
     "timeframe": "1h",
@@ -2756,28 +2763,62 @@
     {
       "symbol": "AKE",
       "name": "Akedo",
-      "price": 0.03305705,
-      "change_24h": -6.5659,
-      "volume": 42747409.77899978,
+      "price": 0.03310916,
+      "change_24h": -4.8884,
+      "volume": 42700046.56799976,
       "contract": "AKEUSD",
-      "why": "New listing + Big mover (-6.6%)",
+      "why": "New listing + High volume",
       "momentum_direction": "LONG",
-      "strength": "Early Signal",
-      "momentum_pct": 1.47,
-      "volume_spike": 0.07,
-      "badge": "Early Signal",
+      "strength": "Weak",
+      "momentum_pct": 1.65,
+      "volume_spike": 0.29,
+      "badge": "Momentum",
       "note": "Less data available \u2014 momentum only (no ATR/ADX/RSI/MACD)",
       "url": "https://www.delta.exchange/app/futures/trade/AKEUSD",
       "source": "Delta India"
     },
     {
+      "symbol": "AIGENSYN",
+      "name": "Gensyn",
+      "price": 0.02179669,
+      "change_24h": 6.8026,
+      "volume": 66839.394,
+      "contract": "AIGENSYNUSD",
+      "why": "Big mover (+6.8%)",
+      "momentum_direction": "LONG",
+      "strength": "Early Signal",
+      "momentum_pct": 0.94,
+      "volume_spike": 0.0,
+      "badge": "Early Signal",
+      "note": "Less data available \u2014 momentum only (no ATR/ADX/RSI/MACD)",
+      "url": "https://www.delta.exchange/app/futures/trade/AIGENSYNUSD",
+      "source": "Delta India"
+    },
+    {
+      "symbol": "LINK",
+      "name": "Chainlink",
+      "price": 14.023,
+      "change_24h": 0.75,
+      "volume": null,
+      "contract": "LINKUSD",
+      "why": "Trending",
+      "momentum_direction": "LONG",
+      "strength": "Early Signal",
+      "momentum_pct": 0.75,
+      "volume_spike": 1.32,
+      "badge": "Early Signal",
+      "note": "Less data available \u2014 momentum only (no ATR/ADX/RSI/MACD)",
+      "url": "https://www.coingecko.com/en/coins/chainlink",
+      "source": "Delta India"
+    },
+    {
       "symbol": "ENJ",
       "name": "Enjin Coin",
-      "price": 0.02962571,
-      "change_24h": 5.6387,
+      "price": 0.029662,
+      "change_24h": 5.6888,
       "volume": 15148.297999999995,
       "contract": "ENJUSD",
-      "why": "Big mover (+5.6%)",
+      "why": "Big mover (+5.7%)",
       "momentum_direction": "LONG",
       "strength": "Early Signal",
       "momentum_pct": 1.22,
@@ -2805,23 +2846,6 @@
       "source": "Delta India"
     },
     {
-      "symbol": "LINK",
-      "name": "Chainlink",
-      "price": 13.969,
-      "change_24h": 0.37,
-      "volume": null,
-      "contract": "LINKUSD",
-      "why": "Trending",
-      "momentum_direction": "LONG",
-      "strength": "Early Signal",
-      "momentum_pct": 0.37,
-      "volume_spike": 0.04,
-      "badge": "Early Signal",
-      "note": "Less data available \u2014 momentum only (no ATR/ADX/RSI/MACD)",
-      "url": "https://www.coingecko.com/en/coins/chainlink",
-      "source": "Delta India"
-    },
-    {
       "symbol": "PONS",
       "name": "Pons",
       "price": null,
@@ -2841,45 +2865,28 @@
     {
       "symbol": "SLVON",
       "name": "iShares Silver (XAG) Trust ONDO Token",
-      "price": 57.87,
-      "change_24h": 0.745,
-      "volume": 10636876.08699992,
+      "price": 57.86,
+      "change_24h": 0.6796,
+      "volume": 10635883.044999916,
       "contract": "SLVONUSD",
       "why": "High volume",
       "momentum_direction": "SHORT",
       "strength": "Early Signal",
-      "momentum_pct": -0.29,
-      "volume_spike": 0.0,
+      "momentum_pct": -0.31,
+      "volume_spike": 0.15,
       "badge": "Early Signal",
       "note": "Less data available \u2014 momentum only (no ATR/ADX/RSI/MACD)",
       "url": "https://www.delta.exchange/app/futures/trade/SLVONUSD",
       "source": "Delta India"
     },
     {
-      "symbol": "SEI",
-      "name": "Sei",
-      "price": 0.07498,
-      "change_24h": 0.33,
-      "volume": null,
-      "contract": "SEIUSD",
-      "why": "Trending",
-      "momentum_direction": "LONG",
-      "strength": "Early Signal",
-      "momentum_pct": 0.33,
-      "volume_spike": 0.0,
-      "badge": "Early Signal",
-      "note": "Less data available \u2014 momentum only (no ATR/ADX/RSI/MACD)",
-      "url": "https://www.coingecko.com/en/coins/sei-network",
-      "source": "Delta India"
-    },
-    {
       "symbol": "CRCLX",
       "name": "Circle xStock Token",
-      "price": 87.53,
-      "change_24h": -5.6888,
-      "volume": 516857.475,
+      "price": 87.67,
+      "change_24h": -5.6271,
+      "volume": 517302.49,
       "contract": "CRCLXUSD",
-      "why": "Big mover (-5.7%)",
+      "why": "Big mover (-5.6%)",
       "momentum_direction": "LONG",
       "strength": "Early Signal",
       "momentum_pct": 0.11,
@@ -2909,15 +2916,15 @@
     {
       "symbol": "RKLBB",
       "name": "Rocket Lab bStocks Token",
-      "price": 73.69,
-      "change_24h": -0.61,
+      "price": 73.71,
+      "change_24h": -0.58,
       "volume": null,
       "contract": "RKLBBUSD",
       "why": "New listing",
       "momentum_direction": "SHORT",
       "strength": "Early Signal",
-      "momentum_pct": -0.61,
-      "volume_spike": 21.28,
+      "momentum_pct": -0.58,
+      "volume_spike": 21.41,
       "badge": "Early Signal",
       "note": "Less data available \u2014 momentum only (no ATR/ADX/RSI/MACD)",
       "url": "https://www.delta.exchange/app/futures/trade/RKLBBUSD",
@@ -2926,47 +2933,46 @@
     {
       "symbol": "NBISB",
       "name": "Nebius bStocks Token",
-      "price": 236.55,
-      "change_24h": -0.55,
+      "price": 236.65,
+      "change_24h": -0.5,
       "volume": null,
       "contract": "NBISBUSD",
       "why": "New listing",
       "momentum_direction": "SHORT",
       "strength": "Early Signal",
-      "momentum_pct": -0.55,
-      "volume_spike": 0.0,
+      "momentum_pct": -0.5,
+      "volume_spike": 0.19,
       "badge": "Early Signal",
       "note": "Less data available \u2014 momentum only (no ATR/ADX/RSI/MACD)",
       "url": "https://www.delta.exchange/app/futures/trade/NBISBUSD",
       "source": "Delta India"
     },
     {
-      "symbol": "MRVLB",
-      "name": "Marvell Technology bStocks Token",
-      "price": 261.68,
-      "change_24h": -0.43,
+      "symbol": "TLM",
+      "name": "Alien Worlds",
+      "price": 0.001582,
+      "change_24h": 0.38,
       "volume": null,
-      "contract": "MRVLBUSD",
+      "contract": "TLMUSD",
       "why": "New listing",
-      "momentum_direction": "SHORT",
+      "momentum_direction": "LONG",
       "strength": "Early Signal",
-      "momentum_pct": -0.43,
+      "momentum_pct": 0.38,
       "volume_spike": 0.0,
       "badge": "Early Signal",
       "note": "Less data available \u2014 momentum only (no ATR/ADX/RSI/MACD)",
-      "url": "https://www.delta.exchange/app/futures/trade/MRVLBUSD",
+      "url": "https://www.delta.exchange/app/futures/trade/TLMUSD",
       "source": "Delta India"
     }
   ],
   "ai_briefing": {
-    "morning_summary": "Major cryptocurrencies are largely flat to slightly down, with BTC and ETH under pressure while altcoins like SOL, DOGE and XRP show modest gains. Regulatory headlines dominate, featuring key SEC and CFTC movements, alongside a significant legal claim against a Tether\u2011linked bank.",
+    "morning_summary": "Major caps slipped modestly with BTC down 0.9% and ETH flat\u2011ish, while mids such as SOL, XRP and DOGE posted gains, keeping the market sideways. Liquidity remains ample on Delta India, but regulatory headlines could add volatility.",
     "market_sentiment": "neutral",
     "things_to_watch": [
-      "SEC Chair Hester Peirce departure and potential policy shift",
-      "US prosecutors' $84.2M claim against Tether\u2011related bank",
-      "Kalshi appeals ruling on sports contracts and its impact on crypto derivatives",
-      "OG.com CFTC approval request for single\u2011stock perpetual futures",
-      "Liquidity and trading volume on Delta India for the five new token listings"
+      "SEC chair Hester Peirce\u2019s imminent departure and potential policy shifts",
+      "US prosecutors\u2019 $84.2\u202fM claim against a Tether\u2011linked bank",
+      "Kalshi appeals decision on sports contracts and its impact on prediction\u2011market regulation",
+      "OG.com\u2019s CFTC application for single\u2011stock perpetual futures"
     ]
   },
   "errors": {
